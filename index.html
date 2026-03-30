@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Family Feud Scoreboard</title>
+    <style>
+        body { background-color: #001f3f; color: white; font-family: 'Arial', sans-serif; text-align: center; }
+        .board { 
+            display: grid; 
+            grid-template-columns: repeat(2, 1fr); 
+            gap: 20px; 
+            width: 80%; margin: 50px auto; 
+        }
+        .slot { 
+            background: linear-gradient(to bottom, #0044cc, #002266);
+            border: 4px solid #ffd700;
+            height: 80px; line-height: 80px;
+            font-size: 24px; font-weight: bold;
+            cursor: pointer; position: relative;
+            text-transform: uppercase;
+        }
+        .slot.hidden span { visibility: hidden; }
+        .slot.revealed { background: #eee; color: #333; }
+        .strike-container { font-size: 100px; color: red; position: fixed; top: 30%; width: 100%; display: none; }
+        .score-container { font-size: 48px; margin-top: 20px; color: #ffd700; }
+    </style>
+</head>
+<body>
+
+    <h1>FAMILY FEUD: MECHANICAL ENGINEERING EDITION</h1>
+    
+    <div class="score-container">TEAM A: <span id="scoreA">0</span> | TEAM B: <span id="scoreB">0</span></div>
+
+    <div class="board" id="gameBoard">
+        </div>
+
+    <div id="strike" class="strike-container">X</div>
+
+    <script>
+        // 1. Data Structure for your questions
+        const answers = [
+            { text: "Solar Panels", pts: 35 },
+            { text: "Wind Turbines", pts: 25 },
+            { text: "Nanofluids", pts: 15 },
+            { text: "Heat Pumps", pts: 10 },
+            { text: "EV Batteries", pts: 8 },
+            { text: "Hydro Power", pts: 4 },
+            { text: "Biomass", pts: 2 },
+            { text: "Geothermal", pts: 1 }
+        ];
+
+        const board = document.getElementById('gameBoard');
+
+        // 2. Build the Board
+        answers.forEach((item, index) => {
+            const div = document.createElement('div');
+            div.className = 'slot hidden';
+            div.innerHTML = `<span>${index + 1}. ${item.text} .......... ${item.pts}</span>`;
+            div.onclick = () => {
+                div.classList.toggle('hidden');
+                div.classList.toggle('revealed');
+                if(div.classList.contains('revealed')) playSound('ding');
+            };
+            board.appendChild(div);
+        });
+
+        // 3. Handle the "Strike" (Press 'X' key)
+        window.onkeydown = (e) => {
+            if (e.key.toLowerCase() === 'x') {
+                const strike = document.getElementById('strike');
+                strike.style.display = 'block';
+                playSound('buzzer');
+                setTimeout(() => strike.style.display = 'none', 1000);
+            }
+        };
+
+        function playSound(type) {
+            // You can add paths to your MP3 files here later
+            console.log("Playing sound: " + type);
+        }
+    </script>
+</body>
+</html>
