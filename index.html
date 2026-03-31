@@ -101,4 +101,97 @@
         }
         .mcq-opt:hover { border-color: var(--aeu-teal); background: white; }
 
-        footer { grid-area: footer;
+        footer { grid-area: footer; border-top: 1px solid var(--aeu-teal); display: flex; align-items: center; justify-content: center; font-size: 11px; color: #888; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div style="color:#888; font-weight: bold;">AEE STUDENT CHAPTER</div>
+        <h1>Applied Science Private University</h1>
+        <div style="color:#888; font-weight: bold;">ASU AMMAN 2026</div>
+    </header>
+
+    <aside class="dashboard-sidebar left">
+        <div class="logo-container-3d">
+            <div class="aee-sphere">AEE</div>
+        </div>
+        <div style="font-size: 12px; color: #999; margin-bottom: 20px;">NATIONAL CHALLENGE</div>
+        <div class="team-label">TEAM A</div>
+        <div class="score-val" id="scoreA">0</div>
+        <div class="buzz-indicator">BUZZER</div>
+    </aside>
+
+    <aside class="dashboard-sidebar right">
+        <div style="font-size: 24px; color: var(--aeu-teal); font-weight: 700;">--:--</div>
+        <div style="font-size: 11px; color: #999; margin-bottom: 20px;">SCOREBOARD</div>
+        <div class="team-label">TEAM B</div>
+        <div class="score-val" id="scoreB">0</div>
+        <div class="buzz-indicator">BUZZER</div>
+    </aside>
+
+    <main id="gameArea">
+        <div class="qa-center-box" id="qBox">
+            <h1 style="color:var(--aeu-teal)">The Great Energy Transition</h1>
+            <p style="font-size:18px; font-weight:normal;">Press [Q] for Stage 1 | [B] for Stage 2</p>
+        </div>
+
+        <div class="mcq-grid" id="mBox">
+            <div class="mcq-opt">A) Photovoltaic Effect</div>
+            <div class="mcq-opt">B) Thermal Conduction</div>
+            <div class="mcq-opt">C) Kinetic Energy</div>
+            <div class="mcq-opt">D) Nuclear Fusion</div>
+        </div>
+    </main>
+
+    <footer>
+        [Q] Stage 1 | [B] Stage 2 | [Space] Reveal/Next | [A/Z] Score Team A | [S/X] Score Team B
+    </footer>
+
+    <script>
+        const questions = [
+            { q: "Define COP in a heat pump system and its formula.", a: "COP = Heat Output / Work Input" },
+            { q: "What is 'solar irradiance' and its significance in a PV audit?", a: "Power per unit area; predicts system yield." },
+            { q: "List 3 demand-side management methods.", a: "Load Shifting, Valley Filling, Peak Clipping." }
+        ];
+
+        let sA = 0, sB = 0, idx = 0, stage = 0, isAns = false;
+
+        window.onkeydown = (e) => {
+            const k = e.key.toLowerCase();
+            if (k === 'q') { stage = 1; idx = 0; isAns = false; document.body.className = 'stage-1'; render(); }
+            if (k === 'b') { stage = 2; document.body.className = 'stage-2'; renderBuzzer(); }
+            if (k === ' ') handleSpace();
+            
+            // Scoring
+            if (k === 'a') { sA += 10; document.getElementById('scoreA').innerText = sA; }
+            if (k === 'z') { sA -= 10; document.getElementById('scoreA').innerText = sA; }
+            if (k === 's') { sB += 10; document.getElementById('scoreB').innerText = sB; }
+            if (k === 'x') { sB -= 10; document.getElementById('scoreB').innerText = sB; }
+        };
+
+        function render() {
+            const qb = document.getElementById('qBox');
+            qb.innerHTML = `
+                <div style="font-size:12px; color:var(--aeu-teal); margin-bottom:10px;">STAGE 1: Q${idx+1}</div>
+                <div>${questions[idx].q}</div>
+                <div id="ans" style="display:none; color:white; background:var(--aeu-teal); padding:10px; margin-top:20px; font-size:20px; border-radius:8px;">${questions[idx].a}</div>
+            `;
+        }
+
+        function handleSpace() {
+            if (stage !== 1) return;
+            const a = document.getElementById('ans');
+            if (a.style.display === 'none') {
+                a.style.display = 'block';
+            } else if (idx < questions.length - 1) {
+                idx++; render();
+            }
+        }
+
+        function renderBuzzer() {
+            document.getElementById('qBox').innerHTML = `<h1>STAGE 2: BUZZER ROUND</h1><p>Both teams compete. First to buzz wins.</p>`;
+        }
+    </script>
+</body>
+</html>
