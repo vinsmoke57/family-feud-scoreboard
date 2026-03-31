@@ -7,7 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
-            --aeu-teal: #24b59c; /* Core branding color from logo */
+            --aeu-teal: #24b59c;
             --pure-white: #ffffff;
             --text-off-black: #333333;
             --light-border: #e0e0e0;
@@ -18,62 +18,155 @@
             color: var(--text-off-black);
             font-family: 'Montserrat', sans-serif;
             margin: 0;
-            overflow: hidden;
             display: grid;
             grid-template-areas: 
                 "header header header"
                 "sidebarL main sidebarR"
                 "footer footer footer";
-            grid-template-columns: 240px 1fr 240px; /* Logo | Main | Scores */
-            grid-template-rows: 90px 1fr 40px; /* Header | Game | Info */
+            grid-template-columns: 240px 1fr 240px;
+            grid-template-rows: 90px 1fr 40px;
             height: 100vh;
+            overflow: hidden;
         }
 
-        /* --- Global Elements --- */
         header { 
             grid-area: header; border-bottom: 2px solid var(--aeu-teal);
             display: flex; align-items: center; justify-content: space-around;
         }
-        h1 { font-size: 24px; color: var(--aeu-teal); margin: 0; text-transform: uppercase; font-weight: 900;}
-        h2 { font-size: 16px; margin: 0; font-weight: 400; color: #666;}
 
-        footer { 
-            grid-area: footer; border-top: 1px solid var(--aeu-teal); background-color: #fbfbfb;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 11px; font-weight: bold; text-transform: uppercase; color: #888;
-        }
-
-        /* --- Sidebar A (Left): The Floating 3D Logo area --- */
-        .sidebar-logo { grid-area: sidebarL; background-color: var(--pure-white); border-right: 1px solid var(--light-border); display: flex; align-items: center; justify-content: center; perspective: 1000px;}
-        .logo-box { width: 100%; text-align: center; color: var(--aeu-teal); font-weight: bold; font-size: 14px;}
+        .sidebar-logo { grid-area: sidebarL; border-right: 1px solid var(--light-border); display: flex; flex-direction: column; align-items: center; justify-content: center; perspective: 1000px; padding: 10px; text-align: center;}
         
-        /* The specific 'AEE ASU' Logo element for 3D simulation */
+        /* The 3D Floating Logo */
         .aee-logo-3d {
-            width: 140px; height: 140px; background-color: var(--aeu-teal); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--pure-white); font-weight: 900; font-size: 32px;
-            box-shadow: 0 10px 25px rgba(36, 181, 156, 0.3);
-            animation: floatAndRotate 8s ease-in-out infinite;
+            width: 120px; height: 120px; background-color: var(--aeu-teal); border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center; color: white; 
+            font-weight: 900; font-size: 28px;
+            box-shadow: 0 10px 25px rgba(36, 181, 156, 0.4);
+            animation: float3D 6s ease-in-out infinite;
         }
 
-        @keyframes floatAndRotate {
-            0% { transform: translate(0, 0px) rotateY(0deg); }
-            50% { transform: translate(0, -15px) rotateY(15deg); }
-            100% { transform: translate(0, 0px) rotateY(0deg); }
+        @keyframes float3D {
+            0% { transform: translateZ(0) rotateY(0deg); }
+            50% { transform: translateZ(50px) rotateY(20deg) translateY(-10px); }
+            100% { transform: translateZ(0) rotateY(0deg); }
         }
 
-        /* --- Sidebar B (Right): Dedicated Sidebar Scores --- */
-        .sidebar-scores { grid-area: sidebarR; background: #fafafa; border-left: 1px solid var(--light-border); box-sizing: border-box;}
-        .score-box { height: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; border-bottom: 1px solid var(--light-border);}
-        
-        .team-title { color: var(--text-off-black); font-weight: bold; text-transform: uppercase; letter-spacing: 1px; font-size: 14px; }
-        .score-display { font-size: 100px; font-weight: 900; color: var(--aeu-teal); margin: 10px 0; }
-        
-        /* Turn-marker logic for Stage 1 */
-        .score-box.active { border-right: 5px solid var(--aeu-teal); }
+        .sidebar-scores { grid-area: sidebarR; border-left: 1px solid var(--light-border); background: #f9f9f9; }
+        .score-box { height: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; border-bottom: 1px solid var(--light-border); transition: 0.3s; }
+        .score-box.active { background: #e8f7f5; border-left: 6px solid var(--aeu-teal); }
+        .score-display { font-size: 80px; font-weight: 900; color: var(--aeu-teal); }
 
-        /* --- Main Dynamic Area --- */
-        #gameArea { grid-area: main; display: flex; align-items: center; justify-content: center;}
+        #gameArea { grid-area: main; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px; text-align: center; }
 
-        /* --- Layout: Stage 1 (Individual QA) --- */
-        .qa-container { display: flex; flex-direction: column; align-items: center; text-align: center; width: 85%;}
-        .stage-indicator { font-size: 12px; color: var(--aeu-teal); text-transform: uppercase; letter-spacing: 3px; border-bottom: 1px solid var(--light-border); padding-bottom: 5px;}
-        .question-box { font-size: 36px; font-weight: 700; line-height: 1.4
+        .question-text { font-size: 32px; font-weight: 700; margin-bottom: 30px; line-height: 1.4; }
+        .answer-text { font-size: 22px; background: var(--aeu-teal); color: white; padding: 15px 25px; border-radius: 10px; visibility: hidden; }
+        .answer-text.show { visibility: visible; }
+
+        footer { grid-area: footer; border-top: 1px solid var(--aeu-teal); display: flex; align-items: center; justify-content: center; font-size: 11px; color: #777; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h2 style="color:#888">AEE Student Chapters</h2>
+        <h1 id="mainHeader">Energy Transition Challenge</h1>
+        <h2 style="color:#888">ASU Amman 2026</h2>
+    </header>
+
+    <aside class="sidebar-logo">
+        <div class="aee-logo-3d">AEE</div>
+        <p style="color:var(--aeu-teal); font-weight:bold; margin-top:20px; font-size:12px;">ASU CHAPTER</p>
+    </aside>
+
+    <aside class="sidebar-scores">
+        <div class="score-box active" id="boxA">
+            <div style="font-weight:bold; font-size:14px;">TEAM A</div>
+            <div class="score-display" id="scoreA">0</div>
+        </div>
+        <div class="score-box" id="boxB">
+            <div style="font-weight:bold; font-size:14px;">TEAM B</div>
+            <div class="score-display" id="scoreB">0</div>
+        </div>
+    </aside>
+
+    <main id="gameArea">
+        <div id="content">
+            <h1 style="font-size: 40px;">National Competition</h1>
+            <p>Welcome to the Energy Auditing Challenge.</p>
+            <p style="color:var(--aeu-teal)">Press <b>[Q]</b> to start Stage 1</p>
+        </div>
+    </main>
+
+    <footer>
+        [T] Title | [Q] Stage 1 | [B] Stage 2 | [Space] Reveal/Next | [A/Z] Team A | [S/X] Team B
+    </footer>
+
+    <script>
+        const stage1_q = [
+            "What is the COP of a heat pump, and how is it calculated?",
+            "Define 'solar irradiance' and its role in a PV audit.",
+            "List 3 methods for Demand-Side Management (DSM).",
+            "What does 'LCOE' stand for?",
+            "Name the Jordan law regulating renewable energy."
+        ];
+        const stage1_a = [
+            "COP = Heat Output / Work Input",
+            "Power per unit area from Sun; predicts system yield.",
+            "Load Shifting, Valley Filling, Peak Clipping.",
+            "Levelized Cost of Energy",
+            "Renewable Energy Law (Law No. 13)"
+        ];
+
+        let pointsA = 0, pointsB = 0, currentQ = 0, step = 0;
+
+        window.onkeydown = (e) => {
+            const key = e.key.toLowerCase();
+            if (key === 'q') startStage1();
+            if (key === 't') window.location.reload(); 
+            if (key === 'b') startStage2();
+            if (key === ' ') handleSpace();
+            
+            // Scoring
+            if (key === 'a') updateScore('A', 10);
+            if (key === 'z') updateScore('A', -10);
+            if (key === 's') updateScore('B', 10);
+            if (key === 'x') updateScore('B', -10);
+        };
+
+        function startStage1() {
+            currentQ = 0; step = 0;
+            renderQuestion();
+        }
+
+        function startStage2() {
+            document.getElementById('gameArea').innerHTML = `<h1>STAGE 2: BUZZER ROUND</h1><p>Ready your ESP32s...</p>`;
+            document.getElementById('boxA').classList.add('active');
+            document.getElementById('boxB').classList.add('active');
+        }
+
+        function renderQuestion() {
+            document.getElementById('gameArea').innerHTML = `
+                <div style="font-size:12px; color:var(--aeu-teal); letter-spacing:2px;">STAGE 1: QUESTION ${currentQ + 1}</div>
+                <div class="question-text">${stage1_q[currentQ]}</div>
+                <div class="answer-text" id="ans">${stage1_a[currentQ]}</div>
+            `;
+        }
+
+        function handleSpace() {
+            const ans = document.getElementById('ans');
+            if (ans && !ans.classList.contains('show')) {
+                ans.classList.add('show');
+            } else if (currentQ < 4) {
+                currentQ++;
+                renderQuestion();
+            }
+        }
+
+        function updateScore(t, v) {
+            if (t === 'A') pointsA += v; else pointsB += v;
+            document.getElementById('scoreA').innerText = pointsA;
+            document.getElementById('scoreB').innerText = pointsB;
+        }
+    </script>
+</body>
+</html>
