@@ -4,19 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AEE ASU: Energy Challenge</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
             --aeu-teal: #24b59c;
             --pure-white: #ffffff;
-            --text-off-black: #333333;
-            --light-border: #e0e0e0;
+            --text-dark: #333333;
+            --border: #e0e0e0;
         }
 
         body {
             background-color: var(--pure-white);
-            color: var(--text-off-black);
-            font-family: 'Montserrat', sans-serif;
+            color: var(--text-dark);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             display: grid;
             grid-template-areas: 
@@ -34,9 +33,13 @@
             display: flex; align-items: center; justify-content: space-around;
         }
 
-        .sidebar-logo { grid-area: sidebarL; border-right: 1px solid var(--light-border); display: flex; flex-direction: column; align-items: center; justify-content: center; perspective: 1000px; padding: 10px; text-align: center;}
+        /* --- 3D Floating Logo Sidebar --- */
+        .sidebar-logo { 
+            grid-area: sidebarL; border-right: 1px solid var(--border); 
+            display: flex; flex-direction: column; align-items: center; 
+            justify-content: center; perspective: 1000px; padding: 10px;
+        }
         
-        /* The 3D Floating Logo */
         .aee-logo-3d {
             width: 120px; height: 120px; background-color: var(--aeu-teal); border-radius: 50%; 
             display: flex; align-items: center; justify-content: center; color: white; 
@@ -51,121 +54,111 @@
             100% { transform: translateZ(0) rotateY(0deg); }
         }
 
-        .sidebar-scores { grid-area: sidebarR; border-left: 1px solid var(--light-border); background: #f9f9f9; }
-        .score-box { height: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; border-bottom: 1px solid var(--light-border); transition: 0.3s; }
+        /* --- Scoring Sidebar --- */
+        .sidebar-scores { grid-area: sidebarR; border-left: 1px solid var(--border); background: #f9f9f9; }
+        .score-box { height: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; border-bottom: 1px solid var(--border); }
         .score-box.active { background: #e8f7f5; border-left: 6px solid var(--aeu-teal); }
         .score-display { font-size: 80px; font-weight: 900; color: var(--aeu-teal); }
 
-        #gameArea { grid-area: main; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px; text-align: center; }
+        /* --- Main Content Area --- */
+        main { grid-area: main; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px; text-align: center; }
+        .q-text { font-size: 32px; font-weight: 700; margin-bottom: 30px; line-height: 1.4; }
+        .a-text { font-size: 22px; background: var(--aeu-teal); color: white; padding: 15px 25px; border-radius: 10px; display: none; }
+        .a-text.visible { display: block; }
 
-        .question-text { font-size: 32px; font-weight: 700; margin-bottom: 30px; line-height: 1.4; }
-        .answer-text { font-size: 22px; background: var(--aeu-teal); color: white; padding: 15px 25px; border-radius: 10px; visibility: hidden; }
-        .answer-text.show { visibility: visible; }
-
-        footer { grid-area: footer; border-top: 1px solid var(--aeu-teal); display: flex; align-items: center; justify-content: center; font-size: 11px; color: #777; }
+        footer { grid-area: footer; border-top: 1px solid var(--aeu-teal); display: flex; align-items: center; justify-content: center; font-size: 11px; color: #888; }
     </style>
 </head>
 <body>
 
     <header>
-        <h2 style="color:#888">AEE Student Chapters</h2>
-        <h1 id="mainHeader">Energy Transition Challenge</h1>
-        <h2 style="color:#888">ASU Amman 2026</h2>
+        <div style="color:#888; font-weight: bold;">AEE STUDENT CHAPTER</div>
+        <h1 style="color:var(--aeu-teal)">ENERGY TRANSITION CHALLENGE</h1>
+        <div style="color:#888; font-weight: bold;">ASU AMMAN 2026</div>
     </header>
 
     <aside class="sidebar-logo">
         <div class="aee-logo-3d">AEE</div>
-        <p style="color:var(--aeu-teal); font-weight:bold; margin-top:20px; font-size:12px;">ASU CHAPTER</p>
+        <p style="color:var(--aeu-teal); font-weight:bold; margin-top:20px; font-size:12px;">APPLIED SCIENCE UNIVERSITY</p>
     </aside>
 
     <aside class="sidebar-scores">
         <div class="score-box active" id="boxA">
-            <div style="font-weight:bold; font-size:14px;">TEAM A</div>
+            <div style="font-weight:bold; font-size:14px;">CHAPTER A</div>
             <div class="score-display" id="scoreA">0</div>
         </div>
         <div class="score-box" id="boxB">
-            <div style="font-weight:bold; font-size:14px;">TEAM B</div>
+            <div style="font-weight:bold; font-size:14px;">CHAPTER B</div>
             <div class="score-display" id="scoreB">0</div>
         </div>
     </aside>
 
     <main id="gameArea">
         <div id="content">
-            <h1 style="font-size: 40px;">National Competition</h1>
-            <p>Welcome to the Energy Auditing Challenge.</p>
-            <p style="color:var(--aeu-teal)">Press <b>[Q]</b> to start Stage 1</p>
+            <h1 style="font-size: 48px; color: var(--text-dark);">National Competition</h1>
+            <p style="font-size: 20px;">Renewable Energy & Auditing</p>
+            <p style="color:var(--aeu-teal); font-weight: bold;">Press [Q] to start Stage 1</p>
         </div>
     </main>
 
     <footer>
-        [T] Title | [Q] Stage 1 | [B] Stage 2 | [Space] Reveal/Next | [A/Z] Team A | [S/X] Team B
+        [T] Title | [Q] Stage 1 | [B] Stage 2 | [Space] Answer/Next | [A/Z] Chapter A Score | [S/X] Chapter B Score
     </footer>
 
     <script>
-        const stage1_q = [
-            "What is the COP of a heat pump, and how is it calculated?",
-            "Define 'solar irradiance' and its role in a PV audit.",
-            "List 3 methods for Demand-Side Management (DSM).",
-            "What does 'LCOE' stand for?",
-            "Name the Jordan law regulating renewable energy."
-        ];
-        const stage1_a = [
-            "COP = Heat Output / Work Input",
-            "Power per unit area from Sun; predicts system yield.",
-            "Load Shifting, Valley Filling, Peak Clipping.",
-            "Levelized Cost of Energy",
-            "Renewable Energy Law (Law No. 13)"
+        const questions = [
+            { q: "What is the COP of a heat pump, and how is it calculated?", a: "COP = Heat Output / Work Input" },
+            { q: "Define 'solar irradiance' and its role in a PV audit.", a: "Power per unit area from Sun; predicts system yield." },
+            { q: "List 3 methods for Demand-Side Management (DSM).", a: "Load Shifting, Valley Filling, Peak Clipping." },
+            { q: "What does 'LCOE' stand for?", a: "Levelized Cost of Energy" },
+            { q: "Name the Jordan law regulating renewable energy.", a: "Renewable Energy Law (Law No. 13)" }
         ];
 
-        let pointsA = 0, pointsB = 0, currentQ = 0, step = 0;
+        let scoreA = 0, scoreB = 0, index = 0, stage = 0;
 
         window.onkeydown = (e) => {
             const key = e.key.toLowerCase();
-            if (key === 'q') startStage1();
-            if (key === 't') window.location.reload(); 
-            if (key === 'b') startStage2();
-            if (key === ' ') handleSpace();
             
-            // Scoring
-            if (key === 'a') updateScore('A', 10);
-            if (key === 'z') updateScore('A', -10);
-            if (key === 's') updateScore('B', 10);
-            if (key === 'x') updateScore('B', -10);
+            if (key === 'q') { stage = 1; index = 0; render(); }
+            if (key === 'b') { stage = 2; renderBuzzer(); }
+            if (key === 't') { location.reload(); }
+            if (key === ' ') { handleInput(); }
+            
+            // Scoring Keys
+            if (key === 'a') { scoreA += 10; document.getElementById('scoreA').innerText = scoreA; }
+            if (key === 'z') { scoreA -= 10; document.getElementById('scoreA').innerText = scoreA; }
+            if (key === 's') { scoreB += 10; document.getElementById('scoreB').innerText = scoreB; }
+            if (key === 'x') { scoreB -= 10; document.getElementById('scoreB').innerText = scoreB; }
         };
 
-        function startStage1() {
-            currentQ = 0; step = 0;
-            renderQuestion();
-        }
-
-        function startStage2() {
-            document.getElementById('gameArea').innerHTML = `<h1>STAGE 2: BUZZER ROUND</h1><p>Ready your ESP32s...</p>`;
-            document.getElementById('boxA').classList.add('active');
-            document.getElementById('boxB').classList.add('active');
-        }
-
-        function renderQuestion() {
-            document.getElementById('gameArea').innerHTML = `
-                <div style="font-size:12px; color:var(--aeu-teal); letter-spacing:2px;">STAGE 1: QUESTION ${currentQ + 1}</div>
-                <div class="question-text">${stage1_q[currentQ]}</div>
-                <div class="answer-text" id="ans">${stage1_a[currentQ]}</div>
+        function render() {
+            const main = document.getElementById('gameArea');
+            main.innerHTML = `
+                <div style="color:var(--aeu-teal); letter-spacing:2px; font-size:12px; margin-bottom:10px;">STAGE 1: QUESTION ${index + 1}</div>
+                <div class="q-text">${questions[index].q}</div>
+                <div class="a-text" id="ansBox">${questions[index].a}</div>
             `;
         }
 
-        function handleSpace() {
-            const ans = document.getElementById('ans');
-            if (ans && !ans.classList.contains('show')) {
-                ans.classList.add('show');
-            } else if (currentQ < 4) {
-                currentQ++;
-                renderQuestion();
+        function handleInput() {
+            if (stage !== 1) return;
+            const ans = document.getElementById('ansBox');
+            if (ans.style.display === 'none' || ans.style.display === '') {
+                ans.style.display = 'block';
+            } else if (index < questions.length - 1) {
+                index++;
+                render();
             }
         }
 
-        function updateScore(t, v) {
-            if (t === 'A') pointsA += v; else pointsB += v;
-            document.getElementById('scoreA').innerText = pointsA;
-            document.getElementById('scoreB').innerText = pointsB;
+        function renderBuzzer() {
+            document.getElementById('gameArea').innerHTML = `
+                <h1 style="color:var(--aeu-teal); font-size:60px;">STAGE 2</h1>
+                <p style="font-size:24px;">BUZZER ROUND READY</p>
+                <p>Waiting for ESP32 Signals...</p>
+            `;
+            document.getElementById('boxA').classList.add('active');
+            document.getElementById('boxB').classList.add('active');
         }
     </script>
 </body>
