@@ -6,16 +6,16 @@
     <title>AEE Energy Transition Challenge</title>
     <style>
         :root {
-            --asu-deep-blue: #0A1E3C; /* Prestigious background */
-            --energy-yellow: #FFC000; /* Neon-style accent */
-            --text-off-white: #EAEAEA;
-            --panel-grey: #2A3648; /* Slight depth for sidebars */
+            --aeu-teal: #24b59c; /* ASU primary branding color */
+            --white: #ffffff;
+            --text-grey: #444444; /* Clean text for readability */
+            --light-shadow: rgba(36, 181, 156, 0.2);
         }
 
         body {
-            background-color: var(--asu-deep-blue);
-            color: var(--text-off-white);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--white);
+            color: var(--text-grey);
+            font-family: 'Montserrat', sans-serif;
             margin: 0;
             overflow: hidden;
             display: grid;
@@ -23,54 +23,69 @@
                 "header header header"
                 "sidebarL main sidebarR"
                 "footer footer footer";
-            grid-template-columns: 200px 1fr 200px; /* Sidebar | Main | Sidebar */
-            grid-template-rows: 80px 1fr 40px; /* Header | Game | Info */
+            grid-template-columns: 240px 1fr 240px; /* Logo | Main | Scores */
+            grid-template-rows: 90px 1fr 40px; /* Header | Game | Info */
             height: 100vh;
         }
 
         /* --- Global Elements --- */
         header { 
-            grid-area: header; border-bottom: 2px solid #3A4A61;
+            grid-area: header; border-bottom: 2px solid var(--aeu-teal);
             display: flex; align-items: center; justify-content: space-around;
         }
-        h1 { font-size: 24px; color: var(--energy-yellow); margin: 0; text-transform: uppercase; letter-spacing: 2px;}
-        h2 { font-size: 16px; margin: 0; opacity: 0.8;}
+        h1 { font-size: 26px; color: var(--aeu-teal); margin: 0; text-transform: uppercase;}
+        h2 { font-size: 16px; margin: 0; opacity: 0.9;}
 
         footer { 
-            grid-area: footer; border-top: 1px solid #3A4A61;
+            grid-area: footer; border-top: 1px solid var(--aeu-teal); background-color: var(--white);
             display: flex; align-items: center; justify-content: center;
-            font-size: 12px; font-weight: bold; text-transform: uppercase;
+            font-size: 12px; font-weight: bold; text-transform: uppercase; color: var(--aeu-teal);
         }
 
-        /* --- Dedicated Sidebar Scores --- */
-        .sidebar { background: var(--panel-grey); border: 2px solid transparent; box-sizing: border-box; text-align: center;}
-        .sidebar.team-a { grid-area: sidebarL; border-right: 2px solid #3A4A61; }
-        .sidebar.team-b { grid-area: sidebarR; border-left: 2px solid #3A4A61; }
-
-        .team-title { color: var(--text-off-white); font-weight: bold; margin-top: 20px; text-transform: uppercase; }
-        .sidebar.active { border-color: var(--energy-yellow); box-shadow: 0 0 15px rgba(255, 192, 0, 0.4); }
-
-        .score-display {
-            font-size: 80px; font-weight: 900; color: var(--energy-yellow);
-            display: flex; align-items: center; justify-content: center; height: 100%;
+        /* --- Floating Logo Area (Left) --- */
+        .sidebar-logo { grid-area: sidebarL; background-color: var(--white); border-right: 1px solid var(--aeu-teal); padding: 20px; box-sizing: border-box; display: flex; align-items: center; justify-content: center;}
+        .logo-box { width: 100%; max-width: 180px; text-align: center; color: var(--aeu-teal); font-weight: bold; font-size: 14px;}
+        
+        /* Simulating the "AEE Logo" area with a placeholder */
+        .aee-logo-placeholder {
+            width: 100px; height: 100px; background-color: var(--aeu-teal); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--white); font-weight: 900; font-size: 24px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            animation: float3D 6s ease-in-out infinite;
         }
+
+        @keyframes float3D {
+            0% { transform: translate(0, 0px) rotateY(0deg); }
+            50% { transform: translate(0, -10px) rotateY(15deg); }
+            100% { transform: translate(0, 0px) rotateY(0deg); }
+        }
+
+        /* --- Dedicated Sidebar Scores (Right) --- */
+        .sidebar-scores { grid-area: sidebarR; background: #fafafa; border-left: 1px solid var(--aeu-teal); box-sizing: border-box;}
+        
+        .score-box { height: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; border-bottom: 1px solid var(--aeu-teal);}
+        .team-title { color: var(--aeu-teal); font-weight: bold; text-transform: uppercase; letter-spacing: 2px; }
+        .score-display { font-size: 100px; font-weight: 900; color: var(--text-grey); margin: 10px 0; }
+        
+        /* Highlight border for current turn */
+        .current-turn { border: 3px solid var(--aeu-teal); box-shadow: 0 0 15px var(--light-shadow); }
 
         /* --- Main Dynamic Area --- */
-        #gameArea { grid-area: main; display: flex; align-items: center; justify-content: center;}
-
-        /* --- Layout: Title Card --- */
-        .title-screen { text-align: center; }
-        .title-screen p { font-size: 18px; line-height: 1.6;}
+        #gameArea { grid-area: main; display: flex; align-items: center; justify-content: center; padding: 40px;}
 
         /* --- Layout: Stage 1 (Individual QA) --- */
-        .qa-container { display: flex; flex-direction: column; align-items: center; text-align: center; width: 80%;}
-        .stage-indicator { font-size: 12px; text-transform: uppercase; letter-spacing: 3px; border-bottom: 1px solid;}
-        .question-box { font-size: 32px; font-weight: bold; line-height: 1.4; margin: 30px 0; }
-        .answer-reveal { font-size: 24px; color: var(--energy-yellow); background: rgba(0,0,0,0.3); padding: 10px; opacity: 0;}
+        .qa-container { display: flex; flex-direction: column; align-items: center; text-align: center;}
+        .stage-indicator { font-size: 12px; color: var(--aeu-teal); text-transform: uppercase; letter-spacing: 3px; border-bottom: 1px solid; padding-bottom: 5px; margin-bottom: 30px;}
+        .question-box { font-size: 36px; font-weight: bold; line-height: 1.4; color: var(--text-grey); margin-bottom: 40px;}
+        .answer-reveal { font-size: 24px; color: var(--white); background-color: var(--aeu-teal); padding: 15px 30px; border-radius: 8px; opacity: 0; box-shadow: 0 5px 15px rgba(0,0,0,0.1);}
         .revealed { opacity: 1; transition: opacity 0.5s;}
 
+        /* --- Layout: Stage 2 (Buzzer Round) --- */
+        .buzzer-ready { text-align: center;}
+        .buzzer-ready h1 { font-size: 60px; color: var(--text-grey); }
+        .buzzer-ready p { font-size: 20px; }
+
         /* --- Controls (Keyboard only) --- */
-        .kb-guide { font-size: 11px; opacity: 0.5;}
+        .kb-guide { font-size: 11px; font-weight: normal;}
     </style>
 </head>
 <body>
@@ -81,69 +96,73 @@
         <h2>ASU Amman / 2026</h2>
     </header>
 
-    <aside class="sidebar team-a active">
-        <div class="team-title">Chapter A</div>
-        <div class="score-display" id="scoreA">0</div>
+    <aside class="sidebar-logo">
+        <div class="logo-box">
+            <div class="aee-logo-placeholder">AEE</div>
+            <p>Applied Science Private University</p>
+        </div>
     </aside>
 
-    <aside class="sidebar team-b">
-        <div class="team-title">Chapter B</div>
-        <div class="score-display" id="scoreB">0</div>
+    <aside class="sidebar-scores">
+        <div class="score-box current-turn" id="boxA">
+            <div class="team-title">Chapter A</div>
+            <div class="score-display" id="scoreA">0</div>
+        </div>
+        <div class="score-box" id="boxB">
+            <div class="team-title">Chapter B</div>
+            <div class="score-display" id="scoreB">0</div>
+        </div>
     </aside>
 
     <main id="gameArea">
-        
         <div class="title-screen" id="viewTitle">
-            <h1>NATIONAL COMPETITION</h1>
-            <p>Welcome, AEE Student Chapter Teams!</p>
-            <p>Ready your Chapter’s Energy Auditing & Renewable Energy insights.</p>
+            <h1 style="font-size: 50px; text-transform: none; color: #444;">National Competition</h1>
+            <p style="font-size: 22px;">Energy Auditing & Renewable Energy insights.</p>
+            <p>Press [Q] to start Stage 1.</p>
         </div>
-
     </main>
 
     <footer>
-        <span class="kb-guide">[K]=Scores | [Q]=Stage 1 | [B]=Stage 2 | [R]=Reset</span>
+        <span class="kb-guide">[T]=Title | [Q]=Stage 1 | [B]=Stage 2 | [Arrows]=Next | [A][Z]/[S][X]=Scores</span>
     </footer>
 
     <script>
-        // Data Structure
+        // Real-world questions based on image_8.png themes
         const competition = {
             stage1_q: [
-                "Define the performance coefficient (COP) in a heat pump system.",
-                "What are the main parameters optimized in a solar PV array energy audit?",
-                "List three key methods for demand-side management in a commercial building.",
-                "How does nanofluid integration improve heat exchanger efficiency?",
-                "State the primary advantage of Geothermal power over Solar power."
+                "What is the COP of a heat pump, and how is it calculated?",
+                "Define 'solar irradiance' and its significance in a renewable energy audit.",
+                "List three key methods for demand-side energy management in a commercial building.",
+                "What does 'LCOE' stand for in a sustainable energy context?",
+                "Which Jordan policy regulates net-metering for rooftop solar installations?"
             ],
             stage1_a: [
-                "COP = (Heat Output) / (Work Input)",
-                "Irradiance, Tilt, Soiling, Inverter efficiency, and wiring losses.",
+                "Coefficient of Performance = (Heat Output) / (Work Input)",
+                "Power per unit area received from the Sun. Vital for predicting PV array yield.",
                 "Load Shifting, Valley Filling, and Peak Clipping.",
-                "It increases the thermal conductivity and surface area of the heat transfer fluid.",
-                "Geothermal provides consistent, non-intermittent Baseload power."
+                "Levelized Cost of Energy (the cost to produce 1 MWh).",
+                "The Renewable Energy and Energy Efficiency Law (Law No. 13)."
             ],
             stage2_q: [
-                "Buzzer Round: What is the primary benefit of Energy Storage Systems (ESS)?",
-                "Buzzer Round: What does the term 'Levelized Cost of Energy' (LCOE) mean?"
+                "Buzzer Round: Jordan generates significant wind power in which northern governorate?",
+                "Buzzer Round: What is the defining feature of 'Baseload' power?"
             ]
         };
 
         // UI State
-        let currentView = 'title';
-        let currentQuestion = 0;
         let pointsA = 0;
         let pointsB = 0;
-        
-        // Navigation Logic (Keyboard Controls)
+        let currentQuestion = 0;
+        let showAnswer = false;
+
+        // --- Controls (Keyboard navigation) ---
         window.onkeydown = (e) => {
             switch (e.key.toLowerCase()) {
-                // Change Layout Views
                 case 't': showTitle(); break;
                 case 'q': startStage1(); break;
                 case 'b': startStage2(); break;
-
-                // Game Logic within Views
-                case 'arrowright': nextStageElement(); break;
+                case 'arrowright': nextStageItem(); break;
+                // Scoring
                 case 'a': adjustScore('A', 10); break;
                 case 'z': adjustScore('A', -10); break;
                 case 's': adjustScore('B', 10); break;
@@ -151,7 +170,6 @@
             }
         };
 
-        // Function definitions
         function adjustScore(team, val) {
             if (team === 'A') pointsA += val;
             if (team === 'B') pointsB += val;
@@ -160,18 +178,26 @@
         }
 
         function showTitle() {
-            // Keep scores, return to title screen view.
+            // Keep scores, go back to splash screen.
         }
 
         function startStage1() {
-            // Set layout for individual QA (one big Q per page).
-            currentView = 'stage1';
+            // Initiate individual QA. Focus on Team A (Active box).
             currentQuestion = 0;
             updateQAView();
         }
 
         function startStage2() {
-            // Set layout for buzzer (We will add the Ably listener here when we return to the scoreboard).
+            // Prepare the buzzer logic view.
+            const main = document.getElementById('gameArea');
+            main.innerHTML = `
+                <div class="buzzer-ready">
+                    <h1>BUZZER ROUND</h1>
+                    <p>Both teams compete. Whoever buzzes first gets to answer.</p>
+                </div>
+            `;
+            // Switch active highlight to both or none.
+            document.getElementById('boxA').classList.remove('current-turn');
         }
 
         function updateQAView() {
@@ -181,17 +207,16 @@
 
             main.innerHTML = `
                 <div class="qa-container">
-                    <span class="stage-indicator">STAGE 1: AUDIT CHALLENGE (Q${currentQuestion+1}/5)</span>
+                    <span class="stage-indicator">STAGE 1: INDIVIDUAL AUDIT (Q${currentQuestion+1}/5)</span>
                     <div class="question-box">${qStr}</div>
                     <div class="answer-reveal" id="answerBox">${aStr}</div>
                 </div>
             `;
         }
 
-        function nextStageElement() {
-            // Logic to either reveal the answer OR go to the next question.
+        function nextStageItem() {
             const aBox = document.getElementById('answerBox');
-            if(aBox && !aBox.classList.contains('revealed')) {
+            if (aBox && !aBox.classList.contains('revealed')) {
                 aBox.classList.add('revealed');
             } else if (currentQuestion < 4) {
                 currentQuestion++;
