@@ -3,163 +3,261 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AEE ASU: Energy Challenge</title>
+    <title>AEE ASU: Unified Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
-            --aeu-teal: #24b59c;
+            --aeu-teal: #24b59c; /* Core branding color */
             --pure-white: #ffffff;
-            --text-dark: #333333;
-            --border: #e0e0e0;
+            --text-off-black: #333333;
+            --light-shadow: rgba(36, 181, 156, 0.2);
+            --border-grey: #e0e0e0;
         }
 
         body {
             background-color: var(--pure-white);
-            color: var(--text-dark);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text-off-black);
+            font-family: 'Montserrat', sans-serif;
             margin: 0;
+            overflow: hidden;
+            height: 100vh;
             display: grid;
             grid-template-areas: 
                 "header header header"
                 "sidebarL main sidebarR"
                 "footer footer footer";
-            grid-template-columns: 240px 1fr 240px;
-            grid-template-rows: 90px 1fr 40px;
-            height: 100vh;
-            overflow: hidden;
+            grid-template-columns: 240px 1fr 240px; /* Sidebar | Main | Sidebar */
+            grid-template-rows: 90px 1fr 40px; /* Header | Game | Info */
         }
 
+        /* --- Global Elements --- */
         header { 
             grid-area: header; border-bottom: 2px solid var(--aeu-teal);
             display: flex; align-items: center; justify-content: space-around;
         }
+        h1 { font-size: 26px; color: var(--aeu-teal); margin: 0; text-transform: uppercase; font-weight: 900;}
+        h2 { font-size: 16px; margin: 0; font-weight: 400; color: #666;}
 
-        /* --- 3D Floating Logo Sidebar --- */
-        .sidebar-logo { 
-            grid-area: sidebarL; border-right: 1px solid var(--border); 
-            display: flex; flex-direction: column; align-items: center; 
-            justify-content: center; perspective: 1000px; padding: 10px;
+        footer { 
+            grid-area: footer; border-top: 1px solid var(--aeu-teal); background-color: var(--pure-white);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 11px; font-weight: bold; text-transform: uppercase; color: #888;
+        }
+
+        /* --- Sidebar elements from sketch (image_11.png) --- */
+        .dashboard-sidebar {
+            background: #fafafa;
+            border: 1px solid var(--border-grey);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-around;
         }
         
-        .aee-logo-3d {
-            width: 120px; height: 120px; background-color: var(--aeu-teal); border-radius: 50%; 
-            display: flex; align-items: center; justify-content: center; color: white; 
-            font-weight: 900; font-size: 28px;
-            box-shadow: 0 10px 25px rgba(36, 181, 156, 0.4);
-            animation: float3D 6s ease-in-out infinite;
+        .chapter-box { font-weight: bold; font-size: 16px; color: var(--aeu-teal); }
+        .stage-box { font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 2px;}
+
+        /* --- Floating 3D Logo area (Left Sidebar) --- */
+        .dashboard-sidebar.left { grid-area: sidebarL; border-right: 1px solid var(--aeu-teal); perspective: 1000px; justify-content: start;}
+        .logo-box-3d { 
+            width: 140px; height: 140px; background-color: var(--aeu-teal); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--pure-white); font-weight: 900; font-size: 32px;
+            box-shadow: 0 10px 25px rgba(36, 181, 156, 0.3);
+            animation: floatAndRotate 8s ease-in-out infinite;
+            margin-bottom: 30px;
         }
 
-        @keyframes float3D {
-            0% { transform: translateZ(0) rotateY(0deg); }
-            50% { transform: translateZ(50px) rotateY(20deg) translateY(-10px); }
-            100% { transform: translateZ(0) rotateY(0deg); }
+        @keyframes floatAndRotate {
+            0% { transform: translate(0, 0px) rotateY(0deg); }
+            50% { transform: translate(0, -15px) rotateY(15deg); }
+            100% { transform: translate(0, 0px) rotateY(0deg); }
         }
 
-        /* --- Scoring Sidebar --- */
-        .sidebar-scores { grid-area: sidebarR; border-left: 1px solid var(--border); background: #f9f9f9; }
-        .score-box { height: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; border-bottom: 1px solid var(--border); }
-        .score-box.active { background: #e8f7f5; border-left: 6px solid var(--aeu-teal); }
-        .score-display { font-size: 80px; font-weight: 900; color: var(--aeu-teal); }
+        /* --- Scoring and Timer (Right Sidebar) --- */
+        .dashboard-sidebar.right { grid-area: sidebarR; border-left: 1px solid var(--aeu-teal); }
+        
+        .score-val { font-size: 80px; font-weight: 900; color: var(--text-off-black); }
+        .timer-val { font-size: 24px; color: var(--aeu-teal); font-weight: 700;}
 
-        /* --- Main Content Area --- */
-        main { grid-area: main; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px; text-align: center; }
-        .q-text { font-size: 32px; font-weight: 700; margin-bottom: 30px; line-height: 1.4; }
-        .a-text { font-size: 22px; background: var(--aeu-teal); color: white; padding: 15px 25px; border-radius: 10px; display: none; }
-        .a-text.visible { display: block; }
+        /* --- BUZZ Buttons (Red per sketch) --- */
+        .buzz-btn {
+            background-color: #ff3333; color: white; border: none; padding: 10px 30px; border-radius: 20px; font-weight: bold; text-transform: uppercase; font-size: 14px;
+            box-shadow: 0 5px 10px rgba(255,51,51,0.3);
+            display: none; /* Only appears in Stage 2 */
+        }
+        .buzzer-active .buzz-btn { display: block; } /* State managed by JS */
+        
+        /* Highlighting active turnout */
+        .current-chapter .score-val { color: var(--aeu-teal); }
 
-        footer { grid-area: footer; border-top: 1px solid var(--aeu-teal); display: flex; align-items: center; justify-content: center; font-size: 11px; color: #888; }
+        /* --- Main Dynamic Area --- */
+        #gameArea { 
+            grid-area: main; 
+            display: grid; 
+            grid-template-rows: 1fr auto; 
+            padding: 40px; 
+            gap: 20px;
+            align-items: center; justify-items: center;
+        }
+
+        /* The Question Area from sketch */
+        .qa-center-box {
+            border: 2px solid var(--aeu-teal);
+            border-radius: 10px;
+            padding: 30px;
+            width: 90%;
+            height: 90%;
+            display: flex;
+            align-items: center; justify-content: center;
+            text-align: center;
+            font-size: 32px; font-weight: bold;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.05);
+        }
+
+        /* The Options Area (MCQs for Stage 2 as in sketch) */
+        .mcq-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            width: 90%;
+            display: none; /* Only appears in Stage 2 */
+        }
+        .mcq-container.active { display: grid; } /* State managed by JS */
+
+        .mcq-option {
+            background-color: #fafafa;
+            border: 1px solid var(--border-grey);
+            border-radius: 8px;
+            padding: 15px;
+            font-size: 16px;
+            display: flex; align-items: center;
+            cursor: pointer;
+        }
+        .mcq-option input { margin-right: 10px; }
+        .mcq-option:hover { background-color: var(--pure-white); border-color: var(--aeu-teal); }
+
     </style>
 </head>
-<body>
+<body class="stage-1 current-chapter-a">
 
     <header>
-        <div style="color:#888; font-weight: bold;">AEE STUDENT CHAPTER</div>
-        <h1 style="color:var(--aeu-teal)">ENERGY TRANSITION CHALLENGE</h1>
-        <div style="color:#888; font-weight: bold;">ASU AMMAN 2026</div>
+        <h2>AEE Student Chapters Challenge</h2>
+        <h1>Applied Science Private University</h1>
+        <h2>ASU Amman / 2026</h2>
     </header>
 
-    <aside class="sidebar-logo">
-        <div class="aee-logo-3d">AEE</div>
-        <p style="color:var(--aeu-teal); font-weight:bold; margin-top:20px; font-size:12px;">APPLIED SCIENCE UNIVERSITY</p>
+    <aside class="dashboard-sidebar left">
+        <div class="logo-box-3d">AEE</div>
+        
+        <div class="stage-box" id="stageIndicator">Stage 1: Audit Qs</div>
+        <div class="chapter-box">Chapter A</div>
+        
+        <div class="score-val" id="scoreA">0</div>
+        
+        <button class="buzz-btn" id="buzzA">BUZZ</button>
     </aside>
 
-    <aside class="sidebar-scores">
-        <div class="score-box active" id="boxA">
-            <div style="font-weight:bold; font-size:14px;">CHAPTER A</div>
-            <div class="score-display" id="scoreA">0</div>
-        </div>
-        <div class="score-box" id="boxB">
-            <div style="font-weight:bold; font-size:14px;">CHAPTER B</div>
-            <div class="score-display" id="scoreB">0</div>
-        </div>
+    <aside class="dashboard-sidebar right">
+        <div class="timer-val" id="timer">--:--</div>
+        
+        <div class="stage-box">Competition Dashboard</div>
+        <div class="chapter-box">Chapter B</div>
+        
+        <div class="score-val" id="scoreB">0</div>
+        
+        <button class="buzz-btn" id="buzzB">BUZZ</button>
     </aside>
 
     <main id="gameArea">
-        <div id="content">
-            <h1 style="font-size: 48px; color: var(--text-dark);">National Competition</h1>
-            <p style="font-size: 20px;">Renewable Energy & Auditing</p>
-            <p style="color:var(--aeu-teal); font-weight: bold;">Press [Q] to start Stage 1</p>
+        <div class="qa-center-box" id="questionBox">
+            <h1 style="font-size: 40px; color: var(--text-off-black);">National Competition</h1>
+            <p style="font-size: 18px; font-weight:400; color: #666;">Waiting for competition start. Press [Q] for Stage 1 or [B] for Stage 2.</p>
+        </div>
+
+        <div class="mcq-container" id="optionBox">
+            <div class="mcq-option"><input type="radio" name="mcq" id="opA">a) Jordan Law No. 13</div>
+            <div class="mcq-option"><input type="radio" name="mcq" id="opB">b) ASU Green Policy</div>
+            <div class="mcq-option"><input type="radio" name="mcq" id="opC">c) JSMO Audit Guideline</div>
+            <div class="mcq-option"><input type="radio" name="mcq" id="opD">d) None of the above</div>
         </div>
     </main>
 
     <footer>
-        [T] Title | [Q] Stage 1 | [B] Stage 2 | [Space] Answer/Next | [A/Z] Chapter A Score | [S/X] Chapter B Score
+        <span class="kb-guide">[T] Title | [Q] Stage 1 | [B] Stage 2 | [Arrows] Next | [A][Z]/[S][X] Scores | [R] Reset Timer</span>
     </footer>
 
     <script>
-        const questions = [
-            { q: "What is the COP of a heat pump, and how is it calculated?", a: "COP = Heat Output / Work Input" },
-            { q: "Define 'solar irradiance' and its role in a PV audit.", a: "Power per unit area from Sun; predicts system yield." },
-            { q: "List 3 methods for Demand-Side Management (DSM).", a: "Load Shifting, Valley Filling, Peak Clipping." },
-            { q: "What does 'LCOE' stand for?", a: "Levelized Cost of Energy" },
-            { q: "Name the Jordan law regulating renewable energy.", a: "Renewable Energy Law (Law No. 13)" }
-        ];
-
-        let scoreA = 0, scoreB = 0, index = 0, stage = 0;
-
-        window.onkeydown = (e) => {
-            const key = e.key.toLowerCase();
-            
-            if (key === 'q') { stage = 1; index = 0; render(); }
-            if (key === 'b') { stage = 2; renderBuzzer(); }
-            if (key === 't') { location.reload(); }
-            if (key === ' ') { handleInput(); }
-            
-            // Scoring Keys
-            if (key === 'a') { scoreA += 10; document.getElementById('scoreA').innerText = scoreA; }
-            if (key === 'z') { scoreA -= 10; document.getElementById('scoreA').innerText = scoreA; }
-            if (key === 's') { scoreB += 10; document.getElementById('scoreB').innerText = scoreB; }
-            if (key === 'x') { scoreB -= 10; document.getElementById('scoreB').innerText = scoreB; }
+        // Data Structure remains the same
+        const competition = {
+            stage1_q: [
+                "Define COP in a heat pump system and its formula.",
+                "What is 'solar irradiance' and its significance in a PV audit?",
+                "List 3 demand-side management methods for commercial buildings.",
+                "What does 'LCOE' stand for in a sustainable energy context?",
+                "Jordan policy regulating net-metering for rooftop solar?"
+            ],
+            stage1_a: [
+                "Coefficient of Performance = (Heat Output) / (Work Input)",
+                "Power per unit area from Sun. Key for predicting yield.",
+                "Load Shifting, Valley Filling, and Peak Clipping.",
+                "Levelized Cost of Energy (avg. cost to produce 1 MWh).",
+                "The Renewable Energy Law (Law No. 13)."
+            ],
+            stage2_q: [
+                " Jordan generates significant wind power in which northern governorate?"
+            ]
         };
 
-        function render() {
-            const main = document.getElementById('gameArea');
-            main.innerHTML = `
-                <div style="color:var(--aeu-teal); letter-spacing:2px; font-size:12px; margin-bottom:10px;">STAGE 1: QUESTION ${index + 1}</div>
-                <div class="q-text">${questions[index].q}</div>
-                <div class="a-text" id="ansBox">${questions[index].a}</div>
-            `;
-        }
+        // UI State
+        let pointsA = 0, pointsB = 0;
+        let currentQ = 0, showAnswer = false;
 
-        function handleInput() {
-            if (stage !== 1) return;
-            const ans = document.getElementById('ansBox');
-            if (ans.style.display === 'none' || ans.style.display === '') {
-                ans.style.display = 'block';
-            } else if (index < questions.length - 1) {
-                index++;
-                render();
+        // --- Controls ---
+        window.onkeydown = (e) => {
+            switch (e.key.toLowerCase()) {
+                // View Switches (re-uses existing structure)
+                case 'q': startStage1(); break;
+                case 'b': startStage2(); break;
+                case 'arrowright': nextQAItem(); break;
+                // Scoring
+                case 'a': adjustScore('A', 10); break;
+                case 'z': adjustScore('A', -10); break;
+                case 's': adjustScore('B', 10); break;
+                case 'x': adjustScore('B', -10); break;
+                case 'r': resetTimer(); break;
             }
+        };
+
+        function adjustScore(team, val) {
+            if (team === 'A') pointsA += val;
+            if (team === 'B') pointsB += val;
+            document.getElementById('scoreA').innerText = pointsA;
+            document.getElementById('scoreB').innerText = pointsB;
         }
 
-        function renderBuzzer() {
-            document.getElementById('gameArea').innerHTML = `
-                <h1 style="color:var(--aeu-teal); font-size:60px;">STAGE 2</h1>
-                <p style="font-size:24px;">BUZZER ROUND READY</p>
-                <p>Waiting for ESP32 Signals...</p>
-            `;
-            document.getElementById('boxA').classList.add('active');
-            document.getElementById('boxB').classList.add('active');
+        function startStage1() {
+            // Initiate individual Q&A. Use the sketch layout's Question place.
+            currentQ = 0; showAnswer = false;
+            updateQAView();
+            // Sidebar updates to indicate stage/turn
+            document.getElementById('stageIndicator').innerText = "Stage 1: Individual QA";
+            document.body.classList.add('stage-1', 'current-chapter-a');
+            document.body.classList.remove('stage-2', 'buzzer-active', 'current-chapter-b');
         }
-    </script>
-</body>
-</html>
+
+        function startStage2() {
+            // Activate the buzzer layout elements
+            const qBox = document.getElementById('questionBox');
+            qBox.innerText = competition.stage2_q[0];
+            qBox.style.fontSize = "26px"; // Smaller font for MCQ context
+
+            // Show MCQs and BUZZ buttons per sketch
+            document.getElementById('optionBox').classList.add('active');
+            document.body.classList.add('stage-2', 'buzzer-active');
+            document.body.classList.remove('stage-1', 'current-chapter-a', 'current-chapter-b');
+            document.getElementById('stageIndicator').innerText = "Stage 2: Buzzer/MCQ";
+        }
+
+        function updateQAView() {
+            const qBox = document.getElementById('questionBox');
+            qBox.innerText = competition.stage1_q[currentQ];
