@@ -2,82 +2,180 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Family Feud Scoreboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ME Feud: Professional Edition</title>
     <style>
-        body { background-color: #001f3f; color: white; font-family: 'Arial', sans-serif; text-align: center; }
-        .board { 
-            display: grid; 
-            grid-template-columns: repeat(2, 1fr); 
-            gap: 20px; 
-            width: 80%; margin: 50px auto; 
+        :root {
+            --panel-blue: #003399;
+            --gold: #ffcc00;
+            --border-silver: #c0c0c0;
         }
-        .slot { 
+
+        body {
+            background: radial-gradient(circle, #001a33 0%, #000a1a 100%);
+            color: white;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+        }
+
+        header {
+            margin-top: 30px;
+            text-shadow: 0 0 15px rgba(255, 204, 0, 0.6);
+        }
+
+        .score-row {
+            display: flex;
+            justify-content: space-around;
+            width: 90%;
+            margin: 20px 0;
+        }
+
+        .team-box {
+            background: linear-gradient(145deg, #002266, #001133);
+            border: 3px solid var(--gold);
+            padding: 15px 40px;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 51, 153, 0.8);
+        }
+
+        .score-val {
+            font-size: 64px;
+            font-weight: 900;
+            color: var(--gold);
+            display: block;
+        }
+
+        .main-board {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            width: 90%;
+            max-width: 1000px;
+            perspective: 1000px;
+        }
+
+        .slot {
+            height: 90px;
             background: linear-gradient(to bottom, #0044cc, #002266);
-            border: 4px solid #ffd700;
-            height: 80px; line-height: 80px;
-            font-size: 24px; font-weight: bold;
-            cursor: pointer; position: relative;
-            text-transform: uppercase;
+            border: 3px solid #555;
+            border-radius: 8px;
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-style: preserve-3d;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
         }
-        .slot.hidden span { visibility: hidden; }
-        .slot.revealed { background: #eee; color: #333; }
-        .strike-container { font-size: 100px; color: red; position: fixed; top: 30%; width: 100%; display: none; }
-        .score-container { font-size: 48px; margin-top: 20px; color: #ffd700; }
+
+        /* The "Flip" Animation Logic */
+        .slot.revealed {
+            transform: rotateX(180deg);
+        }
+
+        .front, .back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            font-weight: bold;
+            border-radius: 5px;
+        }
+
+        .front {
+            background: repeating-linear-gradient(45deg, #003399, #003399 10px, #002b80 10px, #002b80 20px);
+            color: var(--gold);
+            font-size: 40px;
+        }
+
+        .back {
+            background: #eee;
+            color: #111;
+            transform: rotateX(180deg);
+            justify-content: space-between;
+            padding: 0 20px;
+            box-sizing: border-box;
+        }
+
+        .strike-overlay {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 300px;
+            color: #ff0000;
+            font-weight: 900;
+            text-shadow: 0 0 30px black;
+            display: none;
+            z-index: 100;
+        }
     </style>
 </head>
 <body>
 
-    <h1>FAMILY FEUD: MECHANICAL ENGINEERING EDITION</h1>
-    
-    <div class="score-container">TEAM A: <span id="scoreA">0</span> | TEAM B: <span id="scoreB">0</span></div>
+    <header>
+        <h1>MECHANICAL ENGINEERING FEUD</h1>
+    </header>
 
-    <div class="board" id="gameBoard">
+    <div class="score-row">
+        <div class="team-box">
+            <span>TEAM A</span>
+            <span class="score-val" id="scoreA">0</span>
+        </div>
+        <div class="team-box">
+            <span>TEAM B</span>
+            <span class="score-val" id="scoreB">0</span>
+        </div>
+    </div>
+
+    <div class="main-board" id="board">
         </div>
 
-    <div id="strike" class="strike-container">X</div>
+    <div id="strike" class="strike-overlay">X</div>
 
     <script>
-        // 1. Data Structure for your questions
-        const answers = [
-            { text: "Solar Panels", pts: 35 },
-            { text: "Wind Turbines", pts: 25 },
-            { text: "Nanofluids", pts: 15 },
-            { text: "Heat Pumps", pts: 10 },
-            { text: "EV Batteries", pts: 8 },
-            { text: "Hydro Power", pts: 4 },
-            { text: "Biomass", pts: 2 },
-            { text: "Geothermal", pts: 1 }
+        const gameData = [
+            { text: "PV PANELS", pts: 42 },
+            { text: "NANOFLUIDS", pts: 31 },
+            { text: "PUMPS", pts: 18 },
+            { text: "VALVES", pts: 12 },
+            { text: "SENSORS", pts: 10 },
+            { text: "TURBINES", pts: 8 },
+            { text: "GEARS", pts: 5 },
+            { text: "BEARINGS", pts: 2 }
         ];
 
-        const board = document.getElementById('gameBoard');
+        const board = document.getElementById('board');
 
-        // 2. Build the Board
-        answers.forEach((item, index) => {
-            const div = document.createElement('div');
-            div.className = 'slot hidden';
-            div.innerHTML = `<span>${index + 1}. ${item.text} .......... ${item.pts}</span>`;
-            div.onclick = () => {
-                div.classList.toggle('hidden');
-                div.classList.toggle('revealed');
-                if(div.classList.contains('revealed')) playSound('ding');
-            };
-            board.appendChild(div);
+        gameData.forEach((item, i) => {
+            const card = document.createElement('div');
+            card.className = 'slot';
+            card.innerHTML = `
+                <div class="front">${i + 1}</div>
+                <div class="back">
+                    <span>${item.text}</span>
+                    <span>${item.pts}</span>
+                </div>
+            `;
+            card.onclick = () => card.classList.toggle('revealed');
+            board.appendChild(card);
         });
 
-        // 3. Handle the "Strike" (Press 'X' key)
+        // Key Commands
         window.onkeydown = (e) => {
             if (e.key.toLowerCase() === 'x') {
-                const strike = document.getElementById('strike');
-                strike.style.display = 'block';
-                playSound('buzzer');
-                setTimeout(() => strike.style.display = 'none', 1000);
+                const s = document.getElementById('strike');
+                s.style.display = 'block';
+                setTimeout(() => s.style.display = 'none', 1200);
             }
         };
-
-        function playSound(type) {
-            // You can add paths to your MP3 files here later
-            console.log("Playing sound: " + type);
-        }
     </script>
 </body>
 </html>
