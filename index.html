@@ -3,18 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AEE Energy Transition Challenge</title>
+    <title>AEE ASU: Energy Challenge</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
-            --aeu-teal: #24b59c; /* ASU primary branding color */
-            --white: #ffffff;
-            --text-grey: #444444; /* Clean text for readability */
-            --light-shadow: rgba(36, 181, 156, 0.2);
+            --aeu-teal: #24b59c; /* Core branding color from logo */
+            --pure-white: #ffffff;
+            --text-off-black: #333333;
+            --light-border: #e0e0e0;
         }
 
         body {
-            background-color: var(--white);
-            color: var(--text-grey);
+            background-color: var(--pure-white);
+            color: var(--text-off-black);
             font-family: 'Montserrat', sans-serif;
             margin: 0;
             overflow: hidden;
@@ -33,196 +34,46 @@
             grid-area: header; border-bottom: 2px solid var(--aeu-teal);
             display: flex; align-items: center; justify-content: space-around;
         }
-        h1 { font-size: 26px; color: var(--aeu-teal); margin: 0; text-transform: uppercase;}
-        h2 { font-size: 16px; margin: 0; opacity: 0.9;}
+        h1 { font-size: 24px; color: var(--aeu-teal); margin: 0; text-transform: uppercase; font-weight: 900;}
+        h2 { font-size: 16px; margin: 0; font-weight: 400; color: #666;}
 
         footer { 
-            grid-area: footer; border-top: 1px solid var(--aeu-teal); background-color: var(--white);
+            grid-area: footer; border-top: 1px solid var(--aeu-teal); background-color: #fbfbfb;
             display: flex; align-items: center; justify-content: center;
-            font-size: 12px; font-weight: bold; text-transform: uppercase; color: var(--aeu-teal);
+            font-size: 11px; font-weight: bold; text-transform: uppercase; color: #888;
         }
 
-        /* --- Floating Logo Area (Left) --- */
-        .sidebar-logo { grid-area: sidebarL; background-color: var(--white); border-right: 1px solid var(--aeu-teal); padding: 20px; box-sizing: border-box; display: flex; align-items: center; justify-content: center;}
-        .logo-box { width: 100%; max-width: 180px; text-align: center; color: var(--aeu-teal); font-weight: bold; font-size: 14px;}
+        /* --- Sidebar A (Left): The Floating 3D Logo area --- */
+        .sidebar-logo { grid-area: sidebarL; background-color: var(--pure-white); border-right: 1px solid var(--light-border); display: flex; align-items: center; justify-content: center; perspective: 1000px;}
+        .logo-box { width: 100%; text-align: center; color: var(--aeu-teal); font-weight: bold; font-size: 14px;}
         
-        /* Simulating the "AEE Logo" area with a placeholder */
-        .aee-logo-placeholder {
-            width: 100px; height: 100px; background-color: var(--aeu-teal); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--white); font-weight: 900; font-size: 24px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.1);
-            animation: float3D 6s ease-in-out infinite;
+        /* The specific 'AEE ASU' Logo element for 3D simulation */
+        .aee-logo-3d {
+            width: 140px; height: 140px; background-color: var(--aeu-teal); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--pure-white); font-weight: 900; font-size: 32px;
+            box-shadow: 0 10px 25px rgba(36, 181, 156, 0.3);
+            animation: floatAndRotate 8s ease-in-out infinite;
         }
 
-        @keyframes float3D {
+        @keyframes floatAndRotate {
             0% { transform: translate(0, 0px) rotateY(0deg); }
-            50% { transform: translate(0, -10px) rotateY(15deg); }
+            50% { transform: translate(0, -15px) rotateY(15deg); }
             100% { transform: translate(0, 0px) rotateY(0deg); }
         }
 
-        /* --- Dedicated Sidebar Scores (Right) --- */
-        .sidebar-scores { grid-area: sidebarR; background: #fafafa; border-left: 1px solid var(--aeu-teal); box-sizing: border-box;}
+        /* --- Sidebar B (Right): Dedicated Sidebar Scores --- */
+        .sidebar-scores { grid-area: sidebarR; background: #fafafa; border-left: 1px solid var(--light-border); box-sizing: border-box;}
+        .score-box { height: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; border-bottom: 1px solid var(--light-border);}
         
-        .score-box { height: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; border-bottom: 1px solid var(--aeu-teal);}
-        .team-title { color: var(--aeu-teal); font-weight: bold; text-transform: uppercase; letter-spacing: 2px; }
-        .score-display { font-size: 100px; font-weight: 900; color: var(--text-grey); margin: 10px 0; }
+        .team-title { color: var(--text-off-black); font-weight: bold; text-transform: uppercase; letter-spacing: 1px; font-size: 14px; }
+        .score-display { font-size: 100px; font-weight: 900; color: var(--aeu-teal); margin: 10px 0; }
         
-        /* Highlight border for current turn */
-        .current-turn { border: 3px solid var(--aeu-teal); box-shadow: 0 0 15px var(--light-shadow); }
+        /* Turn-marker logic for Stage 1 */
+        .score-box.active { border-right: 5px solid var(--aeu-teal); }
 
         /* --- Main Dynamic Area --- */
-        #gameArea { grid-area: main; display: flex; align-items: center; justify-content: center; padding: 40px;}
+        #gameArea { grid-area: main; display: flex; align-items: center; justify-content: center;}
 
         /* --- Layout: Stage 1 (Individual QA) --- */
-        .qa-container { display: flex; flex-direction: column; align-items: center; text-align: center;}
-        .stage-indicator { font-size: 12px; color: var(--aeu-teal); text-transform: uppercase; letter-spacing: 3px; border-bottom: 1px solid; padding-bottom: 5px; margin-bottom: 30px;}
-        .question-box { font-size: 36px; font-weight: bold; line-height: 1.4; color: var(--text-grey); margin-bottom: 40px;}
-        .answer-reveal { font-size: 24px; color: var(--white); background-color: var(--aeu-teal); padding: 15px 30px; border-radius: 8px; opacity: 0; box-shadow: 0 5px 15px rgba(0,0,0,0.1);}
-        .revealed { opacity: 1; transition: opacity 0.5s;}
-
-        /* --- Layout: Stage 2 (Buzzer Round) --- */
-        .buzzer-ready { text-align: center;}
-        .buzzer-ready h1 { font-size: 60px; color: var(--text-grey); }
-        .buzzer-ready p { font-size: 20px; }
-
-        /* --- Controls (Keyboard only) --- */
-        .kb-guide { font-size: 11px; font-weight: normal;}
-    </style>
-</head>
-<body>
-
-    <header>
-        <h2>AEE Student Chapters Challenge</h2>
-        <h1>The Great Energy Transition</h1>
-        <h2>ASU Amman / 2026</h2>
-    </header>
-
-    <aside class="sidebar-logo">
-        <div class="logo-box">
-            <div class="aee-logo-placeholder">AEE</div>
-            <p>Applied Science Private University</p>
-        </div>
-    </aside>
-
-    <aside class="sidebar-scores">
-        <div class="score-box current-turn" id="boxA">
-            <div class="team-title">Chapter A</div>
-            <div class="score-display" id="scoreA">0</div>
-        </div>
-        <div class="score-box" id="boxB">
-            <div class="team-title">Chapter B</div>
-            <div class="score-display" id="scoreB">0</div>
-        </div>
-    </aside>
-
-    <main id="gameArea">
-        <div class="title-screen" id="viewTitle">
-            <h1 style="font-size: 50px; text-transform: none; color: #444;">National Competition</h1>
-            <p style="font-size: 22px;">Energy Auditing & Renewable Energy insights.</p>
-            <p>Press [Q] to start Stage 1.</p>
-        </div>
-    </main>
-
-    <footer>
-        <span class="kb-guide">[T]=Title | [Q]=Stage 1 | [B]=Stage 2 | [Arrows]=Next | [A][Z]/[S][X]=Scores</span>
-    </footer>
-
-    <script>
-        // Real-world questions based on image_8.png themes
-        const competition = {
-            stage1_q: [
-                "What is the COP of a heat pump, and how is it calculated?",
-                "Define 'solar irradiance' and its significance in a renewable energy audit.",
-                "List three key methods for demand-side energy management in a commercial building.",
-                "What does 'LCOE' stand for in a sustainable energy context?",
-                "Which Jordan policy regulates net-metering for rooftop solar installations?"
-            ],
-            stage1_a: [
-                "Coefficient of Performance = (Heat Output) / (Work Input)",
-                "Power per unit area received from the Sun. Vital for predicting PV array yield.",
-                "Load Shifting, Valley Filling, and Peak Clipping.",
-                "Levelized Cost of Energy (the cost to produce 1 MWh).",
-                "The Renewable Energy and Energy Efficiency Law (Law No. 13)."
-            ],
-            stage2_q: [
-                "Buzzer Round: Jordan generates significant wind power in which northern governorate?",
-                "Buzzer Round: What is the defining feature of 'Baseload' power?"
-            ]
-        };
-
-        // UI State
-        let pointsA = 0;
-        let pointsB = 0;
-        let currentQuestion = 0;
-        let showAnswer = false;
-
-        // --- Controls (Keyboard navigation) ---
-        window.onkeydown = (e) => {
-            switch (e.key.toLowerCase()) {
-                case 't': showTitle(); break;
-                case 'q': startStage1(); break;
-                case 'b': startStage2(); break;
-                case 'arrowright': nextStageItem(); break;
-                // Scoring
-                case 'a': adjustScore('A', 10); break;
-                case 'z': adjustScore('A', -10); break;
-                case 's': adjustScore('B', 10); break;
-                case 'x': adjustScore('B', -10); break;
-            }
-        };
-
-        function adjustScore(team, val) {
-            if (team === 'A') pointsA += val;
-            if (team === 'B') pointsB += val;
-            document.getElementById('scoreA').innerText = pointsA;
-            document.getElementById('scoreB').innerText = pointsB;
-        }
-
-        function showTitle() {
-            // Keep scores, go back to splash screen.
-        }
-
-        function startStage1() {
-            // Initiate individual QA. Focus on Team A (Active box).
-            currentQuestion = 0;
-            updateQAView();
-        }
-
-        function startStage2() {
-            // Prepare the buzzer logic view.
-            const main = document.getElementById('gameArea');
-            main.innerHTML = `
-                <div class="buzzer-ready">
-                    <h1>BUZZER ROUND</h1>
-                    <p>Both teams compete. Whoever buzzes first gets to answer.</p>
-                </div>
-            `;
-            // Switch active highlight to both or none.
-            document.getElementById('boxA').classList.remove('current-turn');
-        }
-
-        function updateQAView() {
-            const main = document.getElementById('gameArea');
-            const qStr = competition.stage1_q[currentQuestion];
-            const aStr = competition.stage1_a[currentQuestion];
-
-            main.innerHTML = `
-                <div class="qa-container">
-                    <span class="stage-indicator">STAGE 1: INDIVIDUAL AUDIT (Q${currentQuestion+1}/5)</span>
-                    <div class="question-box">${qStr}</div>
-                    <div class="answer-reveal" id="answerBox">${aStr}</div>
-                </div>
-            `;
-        }
-
-        function nextStageItem() {
-            const aBox = document.getElementById('answerBox');
-            if (aBox && !aBox.classList.contains('revealed')) {
-                aBox.classList.add('revealed');
-            } else if (currentQuestion < 4) {
-                currentQuestion++;
-                updateQAView();
-            }
-        }
-    </script>
-</body>
-</html>
+        .qa-container { display: flex; flex-direction: column; align-items: center; text-align: center; width: 85%;}
+        .stage-indicator { font-size: 12px; color: var(--aeu-teal); text-transform: uppercase; letter-spacing: 3px; border-bottom: 1px solid var(--light-border); padding-bottom: 5px;}
+        .question-box { font-size: 36px; font-weight: 700; line-height: 1.4
