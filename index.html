@@ -284,6 +284,40 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
 
+        /* Strike Overlay */
+        .strike-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 9999;
+            pointer-events: none;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s ease;
+        }
+        .strike-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .strike-icon {
+            font-size: 350px;
+            color: #ff3333;
+            text-shadow: 0 10px 40px rgba(0,0,0,0.6);
+            font-weight: 900;
+            transform: scale(0.3);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            line-height: 1;
+        }
+        .strike-overlay.active .strike-icon {
+            transform: scale(1);
+        }
+
     </style>
 </head>
 <body>
@@ -300,6 +334,13 @@
             // Magnet logo states
             const [magnetTransform, setMagnetTransform] = useState("translate(0px, 0px)");
             const logoRef = useRef(null);
+
+            // Strike state
+            const [showStrike, setShowStrike] = useState(false);
+            const triggerStrike = () => {
+                setShowStrike(true);
+                setTimeout(() => setShowStrike(false), 1200);
+            };
 
             // You can edit the question and answers right here
             const currentQuestion = "Name a popular renewable energy source";
@@ -357,6 +398,7 @@
                     if (e.target.tagName.toLowerCase() === 'input') return;
 
                     switch(e.key.toLowerCase()) {
+                        case 'x': triggerStrike(); break;
                         case 'q': setTeam1Score(s => s + 1); break;
                         case 'a': setTeam1Score(s => s - 1); break;
                         case 'p': setTeam2Score(s => s + 1); break;
@@ -376,6 +418,11 @@
 
             return (
                 <div>
+                    {/* Strike Overlay */}
+                    <div className={"strike-overlay " + (showStrike ? "active" : "")}>
+                        <div className="strike-icon">❌</div>
+                    </div>
+
                     {/* Magnetic Rotating Logo Wrapper */}
                     <div className="logo-wrapper" ref={logoRef}>
                         <div className="logo-magnet" style={{ transform: magnetTransform }}>
@@ -438,7 +485,7 @@
                                 <button onClick={() => setTeam2Score(s => s - 1)}>-</button>
                             </div>
                             <div style={{ marginTop: "15px", fontSize: "16px", color: "var(--cyan)", fontWeight: 700, opacity: 0.8 }}>
-                                Keys: <strong style={{color:"var(--text-dark)"}}>P</strong> (+) / <strong style={{color:"var(--text-dark)"}}>L</strong> (-)
+                                Keys: <strong style={{color:"var(--text-dark)"}}>P</strong> (+) / <strong style={{color:"var(--text-dark)"}}>L</strong> (-) <span style={{marginLeft: "10px", color: "#ff3333"}}>STRIKE: <strong style={{color:"var(--text-dark)"}}>X</strong></span>
                             </div>
                         </div>
                     </div>
