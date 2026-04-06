@@ -350,6 +350,23 @@
                 return () => window.removeEventListener('mousemove', handleMouseMove);
             }, []);
 
+            // Keyboard shortcuts for scoring
+            useEffect(() => {
+                const handleKeyDown = (e) => {
+                    // Ignore keydown if user is typing in the team name input
+                    if (e.target.tagName.toLowerCase() === 'input') return;
+
+                    switch(e.key.toLowerCase()) {
+                        case 'q': setTeam1Score(s => s + 1); break;
+                        case 'a': setTeam1Score(s => s - 1); break;
+                        case 'p': setTeam2Score(s => s + 1); break;
+                        case 'l': setTeam2Score(s => s - 1); break;
+                    }
+                };
+                window.addEventListener('keydown', handleKeyDown);
+                return () => window.removeEventListener('keydown', handleKeyDown);
+            }, []);
+
             // Flip the card when clicked
             const toggleReveal = (index) => {
                 const newAnswers = [...answers];
@@ -375,7 +392,10 @@
                             <div className="score-box">{team1Score}</div>
                             <div className="controls">
                                 <button onClick={() => setTeam1Score(s => s + 1)}>+</button>
-                                <button onClick={() => setTeam1Score(s => Math.max(0, s - 1))}>-</button>
+                                <button onClick={() => setTeam1Score(s => s - 1)}>-</button>
+                            </div>
+                            <div style={{ marginTop: "15px", fontSize: "16px", color: "var(--cyan)", fontWeight: 700, opacity: 0.8 }}>
+                                Keys: <strong style={{color:"var(--text-dark)"}}>Q</strong> (+) / <strong style={{color:"var(--text-dark)"}}>A</strong> (-)
                             </div>
                         </div>
 
@@ -415,7 +435,10 @@
                             <div className="score-box">{team2Score}</div>
                             <div className="controls">
                                 <button onClick={() => setTeam2Score(s => s + 1)}>+</button>
-                                <button onClick={() => setTeam2Score(s => Math.max(0, s - 1))}>-</button>
+                                <button onClick={() => setTeam2Score(s => s - 1)}>-</button>
+                            </div>
+                            <div style={{ marginTop: "15px", fontSize: "16px", color: "var(--cyan)", fontWeight: 700, opacity: 0.8 }}>
+                                Keys: <strong style={{color:"var(--text-dark)"}}>P</strong> (+) / <strong style={{color:"var(--text-dark)"}}>L</strong> (-)
                             </div>
                         </div>
                     </div>
