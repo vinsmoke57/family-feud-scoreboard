@@ -3,195 +3,145 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AEE ASU: Unified Dashboard</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
+    <title>Dot Follow Effect</title>
+    <!-- Use a modern font -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --aeu-teal: #24b59c;
-            --pure-white: #ffffff;
-            --text-off-black: #333333;
-            --border-grey: #e0e0e0;
-        }
-
         body {
-            background-color: var(--pure-white);
-            color: var(--text-off-black);
-            font-family: 'Montserrat', sans-serif;
             margin: 0;
             overflow: hidden;
-            height: 100vh;
-            display: grid;
-            grid-template-areas: 
-                "header header header"
-                "sidebarL main sidebarR"
-                "footer footer footer";
-            grid-template-columns: 240px 1fr 240px;
-            grid-template-rows: 90px 1fr 40px;
-        }
-
-        header { 
-            grid-area: header; border-bottom: 2px solid var(--aeu-teal);
-            display: flex; align-items: center; justify-content: space-around;
-        }
-        h1 { font-size: 26px; color: var(--aeu-teal); margin: 0; text-transform: uppercase; font-weight: 900;}
-
-        .dashboard-sidebar {
-            background: #fafafa;
-            border: 1px solid var(--border-grey);
-            padding: 20px;
+            background-color: #0b0f19; /* Very dark blue, premium feel */
+            color: #ffffff;
+            font-family: 'Outfit', sans-serif;
             display: flex;
-            flex-direction: column;
+            justify-content: center;
             align-items: center;
-            justify-content: space-around;
-        }
-        
-        .team-label { font-weight: bold; font-size: 18px; color: var(--aeu-teal); text-transform: uppercase; }
-
-        /* --- Multi-Axis 3D Logo (Left Sidebar) --- */
-        .dashboard-sidebar.left { grid-area: sidebarL; border-right: 1px solid var(--aeu-teal); perspective: 1200px; }
-        
-        .logo-container-3d {
-            width: 140px; height: 140px;
-            transform-style: preserve-3d;
-            animation: orbitalRotate 10s linear infinite;
-            display: flex; align-items: center; justify-content: center;
+            height: 100vh;
+            cursor: none; /* Hide default cursor to show our custom one */
         }
 
-        .aee-sphere {
-            width: 120px; height: 120px; background-color: var(--aeu-teal); border-radius: 50%; 
-            display: flex; align-items: center; justify-content: center; color: white; 
-            font-weight: 900; font-size: 32px;
-            box-shadow: 0 15px 35px rgba(36, 181, 156, 0.4);
+        .content {
+            text-align: center;
+            z-index: 10;
+            pointer-events: none; /* Let clicks pass through to canvas */
         }
 
-        @keyframes orbitalRotate {
-            0% { transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg) translateZ(0); }
-            25% { transform: rotateX(15deg) rotateY(90deg) translateY(-10px) translateZ(20px); }
-            50% { transform: rotateX(0deg) rotateY(180deg) translateY(0) translateZ(50px); }
-            75% { transform: rotateX(-15deg) rotateY(270deg) translateY(10px) translateZ(20px); }
-            100% { transform: rotateX(0deg) rotateY(360deg) rotateZ(0deg) translateZ(0); }
+        h1 {
+            font-size: 4rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #18cde6, #802bea);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+            letter-spacing: 2px;
         }
 
-        .dashboard-sidebar.right { grid-area: sidebarR; border-left: 1px solid var(--aeu-teal); }
-        .score-val { font-size: 80px; font-weight: 900; color: var(--text-off-black); }
-
-        /* BUZZ Buttons */
-        .buzz-indicator {
-            background-color: #ff3333; color: white; border: none; padding: 10px 30px; border-radius: 20px; 
-            font-weight: bold; text-transform: uppercase; font-size: 14px; opacity: 0.3;
-        }
-        .stage-2 .buzz-indicator { opacity: 1; box-shadow: 0 5px 15px rgba(255,51,51,0.4); }
-
-        #gameArea { grid-area: main; display: grid; grid-template-rows: 1fr auto; padding: 40px; gap: 20px; align-items: center; justify-items: center; }
-
-        .qa-center-box {
-            border: 2px solid var(--aeu-teal); border-radius: 12px; padding: 30px; width: 90%; height: 80%;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            text-align: center; font-size: 28px; font-weight: bold; background: white;
+        p {
+            color: #94a3b8;
+            font-size: 1.25rem;
+            font-weight: 300;
         }
 
-        .mcq-grid {
-            display: none; grid-template-columns: 1fr 1fr; gap: 15px; width: 90%;
+        canvas {
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
         }
-        .stage-2 .mcq-grid { display: grid; }
-
-        .mcq-opt {
-            background: #f4f4f4; border: 1px solid var(--border-grey); border-radius: 8px; padding: 15px;
-            font-size: 16px; text-align: left; transition: 0.2s;
-        }
-        .mcq-opt:hover { border-color: var(--aeu-teal); background: white; }
-
-        footer { grid-area: footer; border-top: 1px solid var(--aeu-teal); display: flex; align-items: center; justify-content: center; font-size: 11px; color: #888; }
     </style>
 </head>
 <body>
 
-    <header>
-        <div style="color:#888; font-weight: bold;">AEE STUDENT CHAPTER</div>
-        <h1>Applied Science Private University</h1>
-        <div style="color:#888; font-weight: bold;">ASU AMMAN 2026</div>
-    </header>
+    <div class="content">
+        <h1>Move Your Mouse</h1>
+        <p>Creating dynamic web experiences is easier than you think.</p>
+    </div>
 
-    <aside class="dashboard-sidebar left">
-        <div class="logo-container-3d">
-            <div class="aee-sphere">AEE</div>
-        </div>
-        <div style="font-size: 12px; color: #999; margin-bottom: 20px;">NATIONAL CHALLENGE</div>
-        <div class="team-label">TEAM A</div>
-        <div class="score-val" id="scoreA">0</div>
-        <div class="buzz-indicator">BUZZER</div>
-    </aside>
-
-    <aside class="dashboard-sidebar right">
-        <div style="font-size: 24px; color: var(--aeu-teal); font-weight: 700;">--:--</div>
-        <div style="font-size: 11px; color: #999; margin-bottom: 20px;">SCOREBOARD</div>
-        <div class="team-label">TEAM B</div>
-        <div class="score-val" id="scoreB">0</div>
-        <div class="buzz-indicator">BUZZER</div>
-    </aside>
-
-    <main id="gameArea">
-        <div class="qa-center-box" id="qBox">
-            <h1 style="color:var(--aeu-teal)">The Great Energy Transition</h1>
-            <p style="font-size:18px; font-weight:normal;">Press [Q] for Stage 1 | [B] for Stage 2</p>
-        </div>
-
-        <div class="mcq-grid" id="mBox">
-            <div class="mcq-opt">A) Photovoltaic Effect</div>
-            <div class="mcq-opt">B) Thermal Conduction</div>
-            <div class="mcq-opt">C) Kinetic Energy</div>
-            <div class="mcq-opt">D) Nuclear Fusion</div>
-        </div>
-    </main>
-
-    <footer>
-        [Q] Stage 1 | [B] Stage 2 | [Space] Reveal/Next | [A/Z] Score Team A | [S/X] Score Team B
-    </footer>
+    <canvas id="canvas"></canvas>
 
     <script>
-        const questions = [
-            { q: "Define COP in a heat pump system and its formula.", a: "COP = Heat Output / Work Input" },
-            { q: "What is 'solar irradiance' and its significance in a PV audit?", a: "Power per unit area; predicts system yield." },
-            { q: "List 3 demand-side management methods.", a: "Load Shifting, Valley Filling, Peak Clipping." }
-        ];
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
 
-        let sA = 0, sB = 0, idx = 0, stage = 0, isAns = false;
+        let width, height;
+        let mouse = { x: null, y: null };
 
-        window.onkeydown = (e) => {
-            const k = e.key.toLowerCase();
-            if (k === 'q') { stage = 1; idx = 0; isAns = false; document.body.className = 'stage-1'; render(); }
-            if (k === 'b') { stage = 2; document.body.className = 'stage-2'; renderBuzzer(); }
-            if (k === ' ') handleSpace();
+        // Configuration for the dots
+        const numDots = 25;
+        const dots = [];
+
+        // Resize the canvas to fill browser window dynamically
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
             
-            // Scoring
-            if (k === 'a') { sA += 10; document.getElementById('scoreA').innerText = sA; }
-            if (k === 'z') { sA -= 10; document.getElementById('scoreA').innerText = sA; }
-            if (k === 's') { sB += 10; document.getElementById('scoreB').innerText = sB; }
-            if (k === 'x') { sB -= 10; document.getElementById('scoreB').innerText = sB; }
-        };
-
-        function render() {
-            const qb = document.getElementById('qBox');
-            qb.innerHTML = `
-                <div style="font-size:12px; color:var(--aeu-teal); margin-bottom:10px;">STAGE 1: Q${idx+1}</div>
-                <div>${questions[idx].q}</div>
-                <div id="ans" style="display:none; color:white; background:var(--aeu-teal); padding:10px; margin-top:20px; font-size:20px; border-radius:8px;">${questions[idx].a}</div>
-            `;
-        }
-
-        function handleSpace() {
-            if (stage !== 1) return;
-            const a = document.getElementById('ans');
-            if (a.style.display === 'none') {
-                a.style.display = 'block';
-            } else if (idx < questions.length - 1) {
-                idx++; render();
+            // Re-center mouse if it doesn't have a coordinate yet
+            if (mouse.x === null) {
+                mouse.x = width / 2;
+                mouse.y = height / 2;
             }
         }
+        window.addEventListener('resize', resize);
+        resize();
 
-        function renderBuzzer() {
-            document.getElementById('qBox').innerHTML = `<h1>STAGE 2: BUZZER ROUND</h1><p>Both teams compete. First to buzz wins.</p>`;
+        // Track mouse position
+        window.addEventListener('mousemove', (e) => {
+            mouse.x = e.x;
+            mouse.y = e.y;
+        });
+        
+        // Support touch devices 
+        window.addEventListener('touchmove', (e) => {
+            mouse.x = e.touches[0].clientX;
+            mouse.y = e.touches[0].clientY;
+        });
+
+        // Initialize the dots
+        for (let i = 0; i < numDots; i++) {
+            dots.push({
+                x: width / 2,
+                y: height / 2,
+                // Make the leading dot slightly larger, scaling down the tail
+                size: Math.max(0.5, (numDots - i) * 0.4 + 2) 
+            });
         }
+
+        // Animation Loop
+        function animate() {
+            ctx.clearRect(0, 0, width, height);
+
+            // The target for the very first dot is the mouse cursor
+            let targetX = mouse.x;
+            let targetY = mouse.y;
+
+            for (let i = 0; i < numDots; i++) {
+                const dot = dots[i];
+                
+                // Spring physics calculation for smooth dragging effect
+                // The larger the decimal, the "tighter" the spring (less lag)
+                dot.x += (targetX - dot.x) * 0.35; 
+                dot.y += (targetY - dot.y) * 0.35;
+
+                // Color calculation: transitioning from vibrant blue to deep purple
+                // based on position in the tail
+                const hue = 190 + (i / numDots) * 70; // 190 (cyan/blue) to ~260 (purple)
+                const alpha = 1 - (i / numDots) * 0.8; // Fades out towards the end
+                
+                ctx.fillStyle = `hsla(${hue}, 100%, 65%, ${alpha})`;
+                ctx.beginPath();
+                ctx.arc(dot.x, dot.y, dot.size, 0, Math.PI * 2);
+                ctx.fill();
+
+                // The next dot's target is the current dot's updated position
+                targetX = dot.x;
+                targetY = dot.y;
+            }
+
+            requestAnimationFrame(animate);
+        }
+
+        animate();
     </script>
 </body>
 </html>
