@@ -852,11 +852,11 @@
       const root = new THREE.Group();
       scene.add(root);
 
-      // --- OPTION 2: SHINY BRANDED MATERIAL ---
+      // --- MATTE PLASTIC MATERIAL ---
       const brandMaterial = new THREE.MeshStandardMaterial({
         color: 0x24b59c,    // Branded Teal
-        roughness: 0.1,     // Very smooth/shiny
-        metalness: 0.4      // Gives it a slight metallic sheen
+        roughness: 0.8,     // High roughness = matte / not shiny
+        metalness: 0.0      // 0 metalness = pure plastic/dielectric look
       });
 
       // Mouse-rotate state
@@ -886,7 +886,7 @@
           
           model.traverse(function (obj) {
             if (obj.isMesh) {
-              // Apply the shiny Standard Material
+              // Apply the matte plastic Material
               obj.material = brandMaterial;
             }
           });
