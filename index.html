@@ -745,25 +745,20 @@
   <div class="corner-dec bl"></div>
   <div class="corner-dec br"></div>
 
-  <!-- 3D Logo — fixed, mouse-rotate only -->
   <div id="logo-wrap" title="Click & drag to rotate">
     <canvas id="logo-canvas" width="130" height="130" style="width:130px;height:130px;border-radius:10px;"></canvas>
   </div>
 
-  <!-- Big X Overlay -->
   <div id="x-overlay">
     <div id="x-symbol">✗</div>
   </div>
 
-  <!-- Big Check Overlay -->
   <div id="check-overlay">
     <div id="check-symbol">✓</div>
   </div>
 
-  <!-- Buzzer flash -->
   <div id="buzzer-flash"></div>
 
-  <!-- Header -->
   <div id="header">
     <div contenteditable="true" id="game-title" spellcheck="false">Energy Awareness Competition</div>
     <div id="stage-wrap">
@@ -773,10 +768,8 @@
     </div>
   </div>
 
-  <!-- Main Layout -->
   <div id="main">
 
-    <!-- Team A -->
     <div class="team-panel left">
       <input class="team-name-input" id="team-a-name" value="TEAM ALPHA" maxlength="16" spellcheck="false">
       <div class="score-display" id="score-a">0</div>
@@ -784,7 +777,6 @@
       <div class="buzzer-indicator" id="buzz-a"></div>
     </div>
 
-    <!-- Center -->
     <div id="center-panel">
       <div id="round-badge">Round <span id="round-num">1</span> &nbsp;·&nbsp; Stage <span id="round-stage">1</span>
       </div>
@@ -819,7 +811,6 @@
       </div>
     </div>
 
-    <!-- Team B -->
     <div class="team-panel right">
       <input class="team-name-input" id="team-b-name" value="TEAM BRAVO" maxlength="16" spellcheck="false">
       <div class="score-display" id="score-b">0</div>
@@ -834,7 +825,6 @@
     <span id="ws-label">ESP32 disconnected</span>
   </div>
 
-  <!-- Three.js 3D Logo -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script>
     (function () {
@@ -844,27 +834,35 @@
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
       renderer.setClearColor(0x000000, 0);
       renderer.outputEncoding = THREE.sRGBEncoding;
-      renderer.toneMapping = THREE.NoToneMapping;
 
       const scene = new THREE.Scene();
       const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 200);
       camera.position.set(0, 0, 5);
 
-      scene.add(new THREE.AmbientLight(0xffffff, 1.0));
-      const key = new THREE.DirectionalLight(0xffffff, 1.8);
-      key.position.set(3, 5, 6); scene.add(key);
-      const fill = new THREE.DirectionalLight(0x24b59c, 1.2);
-      fill.position.set(-5, 0, 4); scene.add(fill);
-      const rim = new THREE.DirectionalLight(0xf8d13e, 1.0);
-      rim.position.set(0, 4, -3); scene.add(rim);
+      // --- LIGHTING (Required for Standard Material) ---
+      scene.add(new THREE.AmbientLight(0xffffff, 0.8));
+      const key = new THREE.DirectionalLight(0xffffff, 1.5);
+      key.position.set(3, 5, 6); 
+      scene.add(key);
+      
+      const fill = new THREE.DirectionalLight(0x24b59c, 1.0);
+      fill.position.set(-5, 0, 4); 
+      scene.add(fill);
 
       const root = new THREE.Group();
       scene.add(root);
 
-      // Mouse-rotate state (no spring, no movement — stays fixed)
+      // --- OPTION 2: SHINY BRANDED MATERIAL ---
+      const brandMaterial = new THREE.MeshStandardMaterial({
+        color: 0x24b59c,    // Branded Teal
+        roughness: 0.1,     // Very smooth/shiny
+        metalness: 0.4      // Gives it a slight metallic sheen
+      });
+
+      // Mouse-rotate state
       let isRotating = false;
       let rotStart = { x: 0, y: 0 };
-      let rotCurrent = { x: 0, y: 0.3 };   // gentle initial angle
+      let rotCurrent = { x: 0, y: 0.3 };
 
       canvas.addEventListener('mousedown', e => {
         isRotating = true;
@@ -878,21 +876,6 @@
       });
       document.addEventListener('mouseup', () => { isRotating = false; });
 
-      // Touch rotate
-      canvas.addEventListener('touchstart', e => {
-        isRotating = true;
-        const t = e.touches[0];
-        rotStart = { x: t.clientX - rotCurrent.y * 200, y: t.clientY - rotCurrent.x * 200 };
-        e.preventDefault();
-      }, { passive: false });
-      document.addEventListener('touchmove', e => {
-        if (!isRotating) return;
-        const t = e.touches[0];
-        rotCurrent.y = (t.clientX - rotStart.x) / 200;
-        rotCurrent.x = (t.clientY - rotStart.y) / 200;
-      });
-      document.addEventListener('touchend', () => { isRotating = false; });
-
       // Load GLB
       const loaderScript = document.createElement('script');
       loaderScript.src = 'https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js';
@@ -900,14 +883,14 @@
         const loader = new THREE.GLTFLoader();
         loader.load('logo.glb', function (gltf) {
           const model = gltf.scene;
-          // Force all meshes to brand teal #24b59c with a shiny finish
+          
           model.traverse(function (obj) {
             if (obj.isMesh) {
-              obj.material = new THREE.MeshBasicMaterial({
-                color: 24b59c
-              });
+              // Apply the shiny Standard Material
+              obj.material = brandMaterial;
             }
           });
+
           const box = new THREE.Box3().setFromObject(model);
           const center = box.getCenter(new THREE.Vector3());
           const size = box.getSize(new THREE.Vector3());
@@ -915,20 +898,22 @@
           model.position.sub(center);
           model.scale.setScalar(4.2 / maxDim);
           root.add(model);
+          
           const fov = camera.fov * (Math.PI / 180);
           camera.position.z = (4.2 / (2 * Math.tan(fov / 2))) * 1.15;
           camera.updateProjectionMatrix();
         }, undefined, function (err) {
           console.warn('GLB load error:', err);
-          root.add(new THREE.Mesh(
-            new THREE.CylinderGeometry(1, 1, 0.35, 6),
-            new THREE.MeshBasicMaterial({ color: 0x24b59c })
-          ));
+          // Fallback shape if file is missing
+          const fallback = new THREE.Mesh(
+            new THREE.CylinderGeometry(1, 1, 0.4, 6),
+            brandMaterial
+          );
+          root.add(fallback);
         });
       };
       document.head.appendChild(loaderScript);
 
-      // Render loop — apply mouse rotation to root
       (function loop() {
         requestAnimationFrame(loop);
         root.rotation.x = rotCurrent.x;
