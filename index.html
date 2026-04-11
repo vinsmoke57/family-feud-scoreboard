@@ -736,46 +736,6 @@
       box-shadow: 0 0 12px var(--secondary);
     }
 
-    /* ===== CONNECT BUZZER BUTTON ===== */
-    #connect-btn {
-      position: fixed;
-      bottom: 14px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 200;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 20px;
-      background: #1e293b;
-      color: #e2e8f0;
-      border: 1.5px solid rgba(255,255,255,0.12);
-      border-radius: 10px;
-      font-family: 'Oswald', sans-serif;
-      font-size: 0.78rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      cursor: pointer;
-      transition: all 0.2s;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.25);
-    }
-
-    #connect-btn:hover {
-      background: #334155;
-      transform: translateX(-50%) translateY(-2px);
-      box-shadow: 0 6px 20px rgba(0,0,0,0.35);
-    }
-
-    #connect-btn.connected {
-      background: #065f46;
-      border-color: var(--primary);
-      color: #a7f3d0;
-    }
-
-    #connect-btn .btn-icon {
-      font-size: 1.1rem;
-    }
-
     /* ===== BUZZ BANNER — who buzzed first ===== */
     #buzz-banner {
       position: fixed;
@@ -918,14 +878,7 @@
     <div id="buzz-banner-inner"></div>
   </div>
 
-  <div id="ws-status">
-    <div id="ws-dot"></div>
-    <span id="ws-label">Buzzers not connected</span>
-  </div>
 
-  <button id="connect-btn" onclick="connectBuzzer()">
-    <span class="btn-icon">🔌</span> Connect Hardware Buzzers
-  </button>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script>
@@ -1246,6 +1199,9 @@
         case 'p': updateScore('b', +1); break;
         case 'x': showWrongX(); break;
         case ' ': e.preventDefault(); nextQuestion(); break;
+        // ESP32 BLE Keyboard Buzzers
+        case 'a': e.preventDefault(); handleBuzz('a'); break;
+        case 'b': e.preventDefault(); handleBuzz('b'); break;
       }
     });
 
@@ -1406,108 +1362,16 @@
     }
 
     // ============================================================
-    //  ESP32 BUZZER SYSTEM — USB Serial (Wired)
-    //  Uses Web Serial API to read from ESP32 over USB
+    //  ESP32 BLE KEYBOARD BUZZER SYSTEM
+    //  ESP32 acts as Bluetooth keyboard, sends 'a' or 'b' keypress
     //  First-buzz lockout: only the first team to buzz is shown
     // ============================================================
-    let serialPort = null;
-    let serialReader = null;
-    let buzzerLocked = false;   // true after first buzz, reset on next question
+    let buzzerLocked = false;
     let bannerTimeout;
 
-    // ---------- CONNECT BUTTON ----------
-    async function connectBuzzer() {
-      const btn = document.getElementById('connect-btn');
-
-      // If already connected, disconnect
-      if (btn.classList.contains('connected')) {
-        await disconnectSerial();
-        return;
-      }
-
-      // Check Web Serial support
-      if (!('serial' in navigator)) {
-        alert('Web Serial API is not supported in this browser.\nPlease use Google Chrome or Microsoft Edge.');
-        return;
-      }
-
-      try {
-        // Prompt user to pick the ESP32 COM port
-        serialPort = await navigator.serial.requestPort();
-        await serialPort.open({ baudRate: 115200 });
-
-        btn.classList.add('connected');
-        btn.innerHTML = '<span class="btn-icon">✅</span> Buzzers Connected (USB)';
-        setWsStatus('connected', 'ESP32 connected (USB)');
-
-        // Start reading serial data
-        readSerialLoop();
-      } catch (e) {
-        console.log('Serial connection cancelled or failed:', e.message);
-        setWsStatus('disconnected', 'Connection cancelled');
-      }
-    }
-
-    // ---------- READ SERIAL ----------
-    async function readSerialLoop() {
-      const decoder = new TextDecoderStream();
-      const inputDone = serialPort.readable.pipeTo(decoder.writable);
-      const reader = decoder.readable.getReader();
-      serialReader = reader;
-
-      let buffer = '';
-      try {
-        while (true) {
-          const { value, done } = await reader.read();
-          if (done) break;
-          buffer += value;
-
-          // Process complete lines
-          let lines = buffer.split('\n');
-          buffer = lines.pop(); // keep incomplete line in buffer
-
-          for (const line of lines) {
-            const msg = line.trim();
-            if (msg) handleBuzzerMessage(msg);
-          }
-        }
-      } catch (e) {
-        console.log('Serial read error:', e.message);
-      } finally {
-        reader.releaseLock();
-        await disconnectSerial();
-      }
-    }
-
-    // ---------- DISCONNECT ----------
-    async function disconnectSerial() {
-      const btn = document.getElementById('connect-btn');
-      try {
-        if (serialReader) { await serialReader.cancel(); serialReader = null; }
-        if (serialPort) { await serialPort.close(); serialPort = null; }
-      } catch (e) { /* ignore close errors */ }
-      btn.classList.remove('connected');
-      btn.innerHTML = '<span class="btn-icon">🔌</span> Connect Hardware Buzzers';
-      setWsStatus('disconnected', 'Buzzers not connected');
-    }
-
-    // ---------- HANDLE BUZZ ----------
-    function handleBuzzerMessage(msg) {
+    function handleBuzz(team) {
       if (buzzerLocked) return;  // lockout — first buzz wins
       buzzerLocked = true;
-
-      let team = null;
-      if (msg === 'BUZZ_A' || msg === 'A') team = 'a';
-      else if (msg === 'BUZZ_B' || msg === 'B') team = 'b';
-      else team = 'a'; // default
-
-      // Status flash
-      setWsStatus('buzzing', 'BUZZER!');
-      setTimeout(() => {
-        if (document.getElementById('connect-btn').classList.contains('connected')) {
-          setWsStatus('connected', 'Buzzers ready');
-        }
-      }, 1500);
 
       // Visual + audio
       flashBuzzer('team-' + team);
@@ -1524,10 +1388,9 @@
       const nameEl = document.getElementById(team === 'a' ? 'team-a-name' : 'team-b-name');
       const teamName = nameEl.value || (team === 'a' ? 'TEAM ALPHA' : 'TEAM BRAVO');
 
-      banner.className = 'team-' + team;  // reset
+      banner.className = 'team-' + team;
       inner.textContent = '🚨 ' + teamName + ' BUZZED FIRST!';
 
-      // Force reflow for re-animation
       void banner.offsetWidth;
       banner.classList.add('show');
 
@@ -1551,10 +1414,6 @@
       const el = document.getElementById(id);
       el.classList.add('active');
       setTimeout(() => el.classList.remove('active'), 2500);
-    }
-    function setWsStatus(state, label) {
-      document.getElementById('ws-dot').className = state;
-      document.getElementById('ws-label').textContent = label;
     }
 
     // ============================================================
