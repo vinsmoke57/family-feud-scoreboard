@@ -1406,92 +1406,89 @@
     }
 
     // ============================================================
-    //  ESP32 BUZZER SYSTEM
-    //  Supports WebSocket (WiFi) & Web Bluetooth (BLE)
+    //  ESP32 BUZZER SYSTEM — USB Serial (Wired)
+    //  Uses Web Serial API to read from ESP32 over USB
     //  First-buzz lockout: only the first team to buzz is shown
     // ============================================================
-    let ws, wsReconnectTimer;
+    let serialPort = null;
+    let serialReader = null;
     let buzzerLocked = false;   // true after first buzz, reset on next question
     let bannerTimeout;
-
-    // --- Connection config ---
-    const ESP32_IP = '192.168.1.100';
-    const WS_PORT = 81;
-    // BLE UUIDs (Nordic UART Service — common for ESP32)
-    const BLE_SERVICE  = '6e400001-b5a3-f393-e0a9-e50e24dcca9e';
-    const BLE_TX_CHAR   = '6e400003-b5a3-f393-e0a9-e50e24dcca9e'; // notifications from ESP32
 
     // ---------- CONNECT BUTTON ----------
     async function connectBuzzer() {
       const btn = document.getElementById('connect-btn');
+
       // If already connected, disconnect
       if (btn.classList.contains('connected')) {
-        if (ws) { ws.close(); ws = null; }
-        btn.classList.remove('connected');
-        btn.innerHTML = '<span class="btn-icon">🔌</span> Connect Hardware Buzzers';
-        setWsStatus('disconnected', 'Buzzers not connected');
+        await disconnectSerial();
         return;
       }
 
-      // Try Web Bluetooth first (needs user gesture ✓)
-      if (navigator.bluetooth) {
-        try {
-          const device = await navigator.bluetooth.requestDevice({
-            filters: [{ services: [BLE_SERVICE] }],
-            optionalServices: [BLE_SERVICE]
-          });
-          const server = await device.gatt.connect();
-          const service = await server.getPrimaryService(BLE_SERVICE);
-          const txChar = await service.getCharacteristic(BLE_TX_CHAR);
-          await txChar.startNotifications();
-          txChar.addEventListener('characteristicvaluechanged', (e) => {
-            const val = new TextDecoder().decode(e.target.value).trim();
-            handleBuzzerMessage(val);
-          });
-          device.addEventListener('gattserverdisconnected', () => {
-            btn.classList.remove('connected');
-            btn.innerHTML = '<span class="btn-icon">🔌</span> Connect Hardware Buzzers';
-            setWsStatus('disconnected', 'BLE disconnected');
-          });
-          btn.classList.add('connected');
-          btn.innerHTML = '<span class="btn-icon">✅</span> Buzzers Connected (BLE)';
-          setWsStatus('connected', 'BLE connected (' + device.name + ')');
-          return;
-        } catch (e) {
-          console.log('BLE cancelled or failed, trying WebSocket...', e.message);
-        }
+      // Check Web Serial support
+      if (!('serial' in navigator)) {
+        alert('Web Serial API is not supported in this browser.\nPlease use Google Chrome or Microsoft Edge.');
+        return;
       }
 
-      // Fallback: WebSocket
-      connectWebSocket();
+      try {
+        // Prompt user to pick the ESP32 COM port
+        serialPort = await navigator.serial.requestPort();
+        await serialPort.open({ baudRate: 115200 });
+
+        btn.classList.add('connected');
+        btn.innerHTML = '<span class="btn-icon">✅</span> Buzzers Connected (USB)';
+        setWsStatus('connected', 'ESP32 connected (USB)');
+
+        // Start reading serial data
+        readSerialLoop();
+      } catch (e) {
+        console.log('Serial connection cancelled or failed:', e.message);
+        setWsStatus('disconnected', 'Connection cancelled');
+      }
     }
 
-    // ---------- WEBSOCKET ----------
-    function connectWebSocket() {
+    // ---------- READ SERIAL ----------
+    async function readSerialLoop() {
+      const decoder = new TextDecoderStream();
+      const inputDone = serialPort.readable.pipeTo(decoder.writable);
+      const reader = decoder.readable.getReader();
+      serialReader = reader;
+
+      let buffer = '';
+      try {
+        while (true) {
+          const { value, done } = await reader.read();
+          if (done) break;
+          buffer += value;
+
+          // Process complete lines
+          let lines = buffer.split('\n');
+          buffer = lines.pop(); // keep incomplete line in buffer
+
+          for (const line of lines) {
+            const msg = line.trim();
+            if (msg) handleBuzzerMessage(msg);
+          }
+        }
+      } catch (e) {
+        console.log('Serial read error:', e.message);
+      } finally {
+        reader.releaseLock();
+        await disconnectSerial();
+      }
+    }
+
+    // ---------- DISCONNECT ----------
+    async function disconnectSerial() {
       const btn = document.getElementById('connect-btn');
       try {
-        clearTimeout(wsReconnectTimer);
-        setWsStatus('disconnected', 'Connecting...');
-        ws = new WebSocket(`ws://${ESP32_IP}:${WS_PORT}/`);
-        ws.onopen = () => {
-          setWsStatus('connected', 'ESP32 connected (WiFi)');
-          btn.classList.add('connected');
-          btn.innerHTML = '<span class="btn-icon">✅</span> Buzzers Connected (WiFi)';
-        };
-        ws.onmessage = (e) => handleBuzzerMessage(e.data.trim());
-        ws.onclose = () => {
-          setWsStatus('disconnected', 'ESP32 disconnected');
-          btn.classList.remove('connected');
-          btn.innerHTML = '<span class="btn-icon">🔌</span> Connect Hardware Buzzers';
-        };
-        ws.onerror = () => {
-          setWsStatus('disconnected', 'Connection failed');
-          btn.classList.remove('connected');
-          btn.innerHTML = '<span class="btn-icon">🔌</span> Connect Hardware Buzzers';
-        };
-      } catch (e) {
-        setWsStatus('disconnected', 'WS unavailable');
-      }
+        if (serialReader) { await serialReader.cancel(); serialReader = null; }
+        if (serialPort) { await serialPort.close(); serialPort = null; }
+      } catch (e) { /* ignore close errors */ }
+      btn.classList.remove('connected');
+      btn.innerHTML = '<span class="btn-icon">🔌</span> Connect Hardware Buzzers';
+      setWsStatus('disconnected', 'Buzzers not connected');
     }
 
     // ---------- HANDLE BUZZ ----------
