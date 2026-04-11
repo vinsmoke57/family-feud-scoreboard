@@ -735,10 +735,20 @@
       background: var(--secondary);
       box-shadow: 0 0 12px var(--secondary);
     }
+
+    /* ===== BACKGROUND PARTICLES ===== */
+    #particles-canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
   </style>
 </head>
 
 <body>
+
+  <canvas id="particles-canvas"></canvas>
 
   <div class="corner-dec tl"></div>
   <div class="corner-dec tr"></div>
@@ -1338,6 +1348,73 @@
       document.addEventListener('click', () => getCtx(), { once: true });
       document.addEventListener('keydown', () => getCtx(), { once: true });
     });
+  </script>
+
+  <script>
+    // ============================================================
+    //  FLOATING PARTICLES
+    // ============================================================
+    (function () {
+      const cvs = document.getElementById('particles-canvas');
+      const ctx2d = cvs.getContext('2d');
+      let W, H;
+      const PARTICLE_COUNT = 80;
+      const particles = [];
+
+      function resize() {
+        W = cvs.width = window.innerWidth;
+        H = cvs.height = window.innerHeight;
+      }
+      window.addEventListener('resize', resize);
+      resize();
+
+      for (let i = 0; i < PARTICLE_COUNT; i++) {
+        particles.push({
+          x: Math.random() * W,
+          y: Math.random() * H,
+          r: Math.random() * 3 + 1,                 // radius 1–4px
+          vx: (Math.random() - 0.5) * 0.4,           // slow horizontal drift
+          vy: -(Math.random() * 0.3 + 0.05),         // gentle upward float
+          alpha: Math.random() * 0.35 + 0.15,         // visible opacity 15-50%
+          pulse: Math.random() * Math.PI * 2           // phase for twinkle
+        });
+      }
+
+      function draw() {
+        ctx2d.clearRect(0, 0, W, H);
+        const t = performance.now() * 0.001;
+
+        for (const p of particles) {
+          // Move
+          p.x += p.vx;
+          p.y += p.vy;
+
+          // Wrap around edges
+          if (p.y < -5) { p.y = H + 5; p.x = Math.random() * W; }
+          if (p.x < -5) p.x = W + 5;
+          if (p.x > W + 5) p.x = -5;
+
+          // Twinkle
+          const glow = p.alpha + Math.sin(t * 0.8 + p.pulse) * 0.1;
+
+          // Soft glow halo
+          ctx2d.shadowColor = 'rgba(36, 181, 156, 0.4)';
+          ctx2d.shadowBlur = p.r * 3;
+
+          ctx2d.beginPath();
+          ctx2d.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx2d.fillStyle = `rgba(36, 181, 156, ${glow})`;
+          ctx2d.fill();
+        }
+
+        // Reset shadow for next frame
+        ctx2d.shadowColor = 'transparent';
+        ctx2d.shadowBlur = 0;
+
+        requestAnimationFrame(draw);
+      }
+      draw();
+    })();
   </script>
 </body>
 
