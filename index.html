@@ -1125,8 +1125,9 @@
     // ============================================================
     //  TIMER
     // ============================================================
-    function startTimer() {
-      timerSeconds = TIMER_TOTAL;
+    function startTimer(duration) {
+      const total = duration || TIMER_TOTAL;
+      timerSeconds = total;
       const wrap = document.getElementById('timer-wrap');
       const disp = document.getElementById('timer-display');
       const bar = document.getElementById('timer-bar');
@@ -1140,7 +1141,7 @@
       timerInterval = setInterval(() => {
         timerSeconds--;
         disp.textContent = timerSeconds;
-        const pct = (timerSeconds / TIMER_TOTAL) * 100;
+        const pct = (timerSeconds / total) * 100;
         bar.style.transition = 'width 0.95s linear, background 0.3s';
         bar.style.width = pct + '%';
         if (timerSeconds <= 3) {
@@ -1372,6 +1373,10 @@
     function handleBuzz(team) {
       if (buzzerLocked) return;  // lockout — first buzz wins
       buzzerLocked = true;
+
+      // Stop the main timer and start 5-second answer timer
+      stopTimer();
+      startTimer(5);
 
       // Visual + audio
       flashBuzzer('team-' + team);
