@@ -57,7 +57,7 @@
     /* ===== LOGO — fixed top-left corner, no glow, mouse-rotate ===== */
     #logo-wrap {
       position: fixed;
-      top: 4px;
+      top: -10px;
       left: 4px;
       z-index: 9999;
       cursor: grab;
@@ -191,7 +191,7 @@
       color: var(--secondary-dark);
     }
 
-    .team-name-input:focus {
+.team-name-input:focus {
       border-bottom-color: var(--secondary);
       cursor: text;
     }
@@ -745,7 +745,7 @@
   <div class="corner-dec bl"></div>
   <div class="corner-dec br"></div>
 
-  <div id="logo-wrap" title="Click & drag to rotate">
+  <div id="logo-wrap" title="Click &amp; drag to rotate">
     <canvas id="logo-canvas" width="130" height="130" style="width:130px;height:130px;border-radius:10px;"></canvas>
   </div>
 
@@ -778,7 +778,7 @@
     </div>
 
     <div id="center-panel">
-      <div id="round-badge">Round <span id="round-num">1</span> &nbsp;·&nbsp; Stage <span id="round-stage">1</span>
+      <div id="round-badge">Round <span id="round-num">0</span> &nbsp;·&nbsp; Stage <span id="round-stage">1</span>
       </div>
 
       <div id="question-board">
@@ -844,17 +844,17 @@
       const key = new THREE.DirectionalLight(0xffffff, 1.5);
       key.position.set(3, 5, 6); 
       scene.add(key);
-      
-      const fill = new THREE.DirectionalLight(0x24b59c, 1.0);
+
+      const fill = new THREE.DirectionalLight(0x1a8a76, 1.0);
       fill.position.set(-5, 0, 4); 
       scene.add(fill);
 
       const root = new THREE.Group();
       scene.add(root);
 
-      // --- MATTE PLASTIC MATERIAL ---
+      // --- DARKER MATTE MATERIAL — matches title color ---
       const brandMaterial = new THREE.MeshStandardMaterial({
-        color: 0x24b59c,    // Branded Teal
+        color: 0x1a8a76,    // Darker teal to match title (--primary-dark)
         roughness: 0.8,     // High roughness = matte / not shiny
         metalness: 0.0      // 0 metalness = pure plastic/dielectric look
       });
@@ -883,10 +883,10 @@
         const loader = new THREE.GLTFLoader();
         loader.load('logo.glb', function (gltf) {
           const model = gltf.scene;
-          
+
           model.traverse(function (obj) {
             if (obj.isMesh) {
-              // Apply the matte plastic Material
+              // Apply the darker matte Material
               obj.material = brandMaterial;
             }
           });
@@ -898,7 +898,7 @@
           model.position.sub(center);
           model.scale.setScalar(4.2 / maxDim);
           root.add(model);
-          
+
           const fov = camera.fov * (Math.PI / 180);
           camera.position.z = (4.2 / (2 * Math.tan(fov / 2))) * 1.15;
           camera.updateProjectionMatrix();
@@ -932,7 +932,7 @@
     let allQuestions = [];
     let currentQuestion = null;
     let usedIndices = new Set();
-    let roundNum = 1;
+    let roundNum = 0;         // Start at 0 so first question shown becomes Round 1
     let scoreA = 0, scoreB = 0;
     let currentStage = 1;
     let questionVisible = false;
@@ -1001,8 +1001,6 @@
     function pickNextQuestion() {
       if (usedIndices.size >= allQuestions.length) {
         usedIndices.clear();
-        roundNum++;
-        document.getElementById('round-num').textContent = roundNum;
       }
       let idx;
       const max = allQuestions.length;
@@ -1039,16 +1037,23 @@
       document.getElementById('round-stage').textContent = n;
       allQuestions = n === 1 ? questionsR1 : questionsR2;
       usedIndices.clear();
+      roundNum = 0;
+      document.getElementById('round-num').textContent = roundNum;
       pickNextQuestion();
       nextQuestion();
     }
 
     // ============================================================
-    //  T → SHOW QUESTION + START TIMER
+    //  T → SHOW QUESTION + START TIMER + INCREMENT ROUND
     // ============================================================
     function showQuestion() {
       if (!currentQuestion || questionVisible) return;
       questionVisible = true;
+
+      // Increment round counter every time a question is revealed
+      roundNum++;
+      document.getElementById('round-num').textContent = roundNum;
+
       document.getElementById('question-waiting').style.display = 'none';
       document.getElementById('answer-reveal').style.display = 'none';
       answerVisible = false;
