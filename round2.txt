@@ -1,23 +1,149 @@
-Q: Name something found in a doctor's office
-A: Stethoscope
+Q: What is the fundamental principle behind Concentrated Solar Power (CSP)?
+A: Concentration of sunlight to produce high-temperature heat
 
-Q: pp
-A: ppp
+Q: Which type of solar radiation is primarily required for efficient CSP operation?
+A: Direct Normal Irradiance (DNI)
 
-Q: Name something kids love
-A: adults
+Q: Which CSP technology uses long, curved mirrors focusing sunlight onto a linear receiver tube?
+A: Parabolic trough
 
-Q: Name call sick
-A: Fu
+Q: Which CSP configuration achieves the highest operating temperatures?
+A: Solar power tower
 
-Q: Name something you lose easily
-A: Keys
+Q: What is the primary working fluid in many modern CSP power towers?
+A: Molten salt
 
-Q: Name a popular holiday destination
-A: Dubai
+Q: What is the main advantage of CSP over PV in grid applications?
+A: Integrated thermal energy storage capability
 
-Q: Name something you buy at a supermarket
-A: Bread
+Q: Why is thermal energy storage in CSP often more economical than battery storage?
+A: Thermal storage materials are cheaper than electrochemical storage materials
 
-Q: Name something people do to relax
-A: Watch TV
+Q: Which CSP technology uses a dish-shaped reflector with an engine at the focal point?
+A: Dish-Stirling system
+
+Q: What is the main limitation of CSP deployment in northern climates?
+A: Low Direct Normal Irradiance (DNI)
+
+Q: Which thermodynamic cycle is most commonly used in CSP plants?
+A: Rankine steam cycle
+
+Q: What is the primary purpose of heliostats in a power tower system?
+A: Track and reflect sunlight toward the central receiver
+
+Q: Why does CSP require solar tracking systems?
+A: Maintain focus of direct sunlight on receiver
+
+Q: What is the typical temperature range of molten salt in CSP storage systems?
+A: 290–565°C
+
+Q: Which CSP system typically has the lowest optical efficiency?
+A: Linear Fresnel reflector
+
+Q: What is the primary cause of efficiency loss in CSP systems during cloudy conditions?
+A: Reduction in direct beam radiation
+
+Q: Why is CSP typically deployed at utility scale rather than rooftop scale?
+A: Requirement for large land area and high DNI
+
+Q: Which factor most strongly influences CSP plant capacity factor?
+A: Thermal energy storage duration
+
+Q: What is the main purpose of a heat transfer fluid (HTF) in CSP systems?
+A: Transport absorbed solar heat to the power block
+
+Q: Which CSP technology typically operates at the lowest temperature?
+A: Parabolic trough
+
+Q: What is the main advantage of two-tank molten salt storage systems?
+A: Decoupling of solar collection and power generation
+
+Q: Why is molten salt preheating required in CSP plants?
+A: Prevent salt solidification in pipes
+
+Q: Which loss is unique to CSP compared to PV systems?
+A: Thermal losses from receivers and piping
+
+Q: What is the main role of a steam generator in CSP plants?
+A: Convert thermal energy into steam for turbines
+
+Q: Which CSP configuration allows the easiest integration with fossil fuel backup?
+A: Parabolic trough
+
+Q: Why is water consumption a major concern for CSP plants?
+A: Steam cycle cooling requirements
+
+Q: Which cooling method significantly reduces CSP water consumption?
+A: Dry (air) cooling
+
+Q: What is the primary economic disadvantage of CSP compared to PV?
+A: Higher capital cost per installed kW
+
+Q: Which CSP system has the highest theoretical solar-to-electric efficiency?
+A: Dish Stirling
+
+Q: Why is CSP considered dispatchable renewable energy?
+A: Can store thermal energy for later generation
+
+Q: What limits CSP deployment near coastal or humid regions?
+A: Lower availability of high DNI
+
+Q: What is the function of a receiver in CSP systems?
+A: Absorb concentrated solar radiation as heat
+
+Q: Why are selective coatings used on CSP receivers?
+A: Maximize absorption and minimize thermal radiation losses
+
+Q: Which CSP component requires the most precise alignment?
+A: Heliostats or mirrors
+
+Q: What is the main operational challenge of molten salt CSP systems?
+A: Risk of salt freezing during shutdowns
+
+Q: Which hybrid configuration improves CSP reliability?
+A: CSP + natural gas backup
+
+Q: What grid service can CSP plants provide better than PV?
+A: Firm capacity and inertia-like response
+
+Q: Why is CSP suitable for evening peak demand?
+A: Thermal storage enables post-sunset generation
+
+Q: Which parameter best represents CSP energy storage size?
+A: Hours of full-load operation
+
+Q: Why does CSP typically use a Rankine cycle rather than Brayton?
+A: Compatibility with thermal storage and steam generation
+
+Q: Which environmental impact is most associated with CSP plants?
+A: Land use and water consumption
+
+Q: Why is mirror reflectivity critical in CSP performance?
+A: Directly affects optical efficiency
+
+Q: What is the primary cause of optical losses in CSP fields?
+A: Cosine, shading, and blocking losses
+
+Q: Which CSP technology is least mature commercially?
+A: Dish Stirling
+
+Q: Why are CSP plants often built in desert regions?
+A: High DNI and low cloud cover
+
+Q: What is the main advantage of supercritical CO₂ cycles in CSP research?
+A: Higher thermal efficiency at high temperatures
+
+Q: Which CSP system component has the highest operating temperature?
+A: Receiver
+
+Q: What determines the optical efficiency of a CSP field?
+A: Mirror alignment, cleanliness, and reflectivity
+
+Q: Which factor most limits CSP scalability compared to PV?
+A: High capital cost and site constraints
+
+Q: Why is CSP often combined with energy storage rather than batteries?
+A: Thermal storage integrates naturally with CSP heat generation
+
+Q: Which future role is CSP best suited to play in renewable-dominated grids?
+A: Dispatchable renewable generation with storage

@@ -839,24 +839,12 @@
       const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 200);
       camera.position.set(0, 0, 5);
 
-      // --- LIGHTING (Required for Standard Material) ---
-      scene.add(new THREE.AmbientLight(0xffffff, 0.8));
-      const key = new THREE.DirectionalLight(0xffffff, 1.5);
-      key.position.set(3, 5, 6); 
-      scene.add(key);
-
-      const fill = new THREE.DirectionalLight(0x1a8a76, 1.0);
-      fill.position.set(-5, 0, 4); 
-      scene.add(fill);
-
       const root = new THREE.Group();
       scene.add(root);
 
-      // --- DARKER MATTE MATERIAL — matches title color ---
-      const brandMaterial = new THREE.MeshStandardMaterial({
-        color: 0x1a8a76,    // Darker teal to match title (--primary-dark)
-        roughness: 0.8,     // High roughness = matte / not shiny
-        metalness: 0.0      // 0 metalness = pure plastic/dielectric look
+      // --- SOLID COLOR MATERIAL — exact match to title color, no lighting needed ---
+      const brandMaterial = new THREE.MeshBasicMaterial({
+        color: 0x1a8a76     // Exact title color (--primary-dark), no light interaction
       });
 
       // Mouse-rotate state
