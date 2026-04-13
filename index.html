@@ -4,11 +4,235 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Family Feud Game</title>
+  <title>AEE Annual Conference</title>
+  <meta name="description" content="Welcome to the AEE Annual Conference — Energy Awareness Competition">
   <link
-    href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@400;600;700&family=Inter:wght@400;500;600&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@400;600;700&family=Inter:wght@400;500;600&family=Outfit:wght@300;400;600;700&display=swap"
     rel="stylesheet">
   <style>
+    /* =======================================
+       INTRO OVERLAY STYLES
+       ======================================= */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      overflow: hidden;
+      width: 100%;
+      height: 100%;
+    }
+
+    #intro-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 99999;
+      background: #030014;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1), transform 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    #intro-overlay.fade-out {
+      opacity: 0;
+      transform: scale(1.05);
+      pointer-events: none;
+    }
+
+    #intro-overlay.hidden {
+      display: none;
+    }
+
+    #intro-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+
+    #intro-content {
+      position: absolute;
+      inset: 0;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      height: 100%;
+      padding: 0 6vw;
+      pointer-events: none;
+      background: linear-gradient(90deg, rgba(3, 0, 20, 0.7) 0%, rgba(3, 0, 20, 0.3) 35%, transparent 55%);
+    }
+
+    #intro-text {
+      max-width: 45%;
+      opacity: 0;
+      transform: translateX(-60px);
+      animation: textSlideIn 1.4s cubic-bezier(0.16, 1, 0.3, 1) 0.5s forwards;
+    }
+
+    @keyframes textSlideIn {
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    #intro-text h1 {
+      font-family: 'Outfit', 'Bebas Neue', sans-serif;
+      font-weight: 700;
+      font-size: clamp(2rem, 4.5vw, 4.2rem);
+      line-height: 1.1;
+      color: #ffffff;
+      letter-spacing: 0.02em;
+      text-shadow: 0 0 60px rgba(36, 181, 156, 0.3), 0 0 120px rgba(36, 181, 156, 0.1);
+      margin-bottom: 20px;
+    }
+
+    #intro-text h1 .accent {
+      background: linear-gradient(135deg, #24b59c, #4ae8cc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    #intro-text p {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 300;
+      font-size: clamp(0.9rem, 1.5vw, 1.3rem);
+      color: rgba(255, 255, 255, 0.45);
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      opacity: 0;
+      transform: translateY(15px);
+      animation: subtitleFadeIn 1s ease 1.4s forwards;
+    }
+
+    @keyframes subtitleFadeIn {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Loading indicator */
+    #intro-loader {
+      position: absolute;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      z-index: 3;
+      opacity: 0;
+      animation: loaderFadeIn 0.6s ease 2s forwards;
+    }
+
+    @keyframes loaderFadeIn {
+      to { opacity: 1; }
+    }
+
+    .loader-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #24b59c;
+      animation: loaderPulse 1.4s ease-in-out infinite;
+    }
+
+    .loader-dot:nth-child(2) { animation-delay: 0.2s; }
+    .loader-dot:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes loaderPulse {
+      0%, 80%, 100% { opacity: 0.2; transform: scale(0.8); }
+      40% { opacity: 1; transform: scale(1.3); }
+    }
+
+    /* Coordinate display during zoom */
+    #coord-display {
+      position: absolute;
+      bottom: 60px;
+      right: 6vw;
+      font-family: 'Outfit', monospace;
+      font-size: 0.85rem;
+      color: rgba(74, 232, 204, 0.6);
+      letter-spacing: 0.15em;
+      z-index: 3;
+      opacity: 0;
+      transition: opacity 0.6s ease;
+    }
+
+    #coord-display.show {
+      opacity: 1;
+    }
+
+    /* Marker ping animation */
+    #marker-ping {
+      position: absolute;
+      z-index: 3;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+
+    #marker-ping.show {
+      opacity: 1;
+    }
+
+    #marker-ping .ping-ring {
+      width: 40px;
+      height: 40px;
+      border: 2px solid rgba(74, 232, 204, 0.6);
+      border-radius: 50%;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      animation: pingExpand 1.5s ease-out infinite;
+    }
+
+    #marker-ping .ping-ring:nth-child(2) {
+      animation-delay: 0.5s;
+    }
+
+    #marker-ping .ping-center {
+      width: 8px;
+      height: 8px;
+      background: #4ae8cc;
+      border-radius: 50%;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 0 15px #4ae8cc, 0 0 30px rgba(74, 232, 204, 0.4);
+    }
+
+    @keyframes pingExpand {
+      0% { width: 8px; height: 8px; opacity: 1; }
+      100% { width: 60px; height: 60px; opacity: 0; }
+    }
+
+    /* =======================================
+       MAIN WEBSITE STYLES
+       ======================================= */
+    #main-website {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+      min-height: 100vh;
+    }
+
+    #main-website.revealed {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* === ALL EXISTING STYLES BELOW === */
     :root {
       --primary: #24b59c;
       --primary-dark: #1a8a76;
@@ -27,12 +251,6 @@
       --text-muted: #7ab8ae;
       --border: rgba(36, 181, 156, 0.22);
       --shadow: 0 4px 24px rgba(36, 181, 156, 0.13);
-    }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
     }
 
     body {
@@ -191,7 +409,7 @@
       color: var(--secondary-dark);
     }
 
-.team-name-input:focus {
+    .team-name-input:focus {
       border-bottom-color: var(--secondary);
       cursor: text;
     }
@@ -270,7 +488,7 @@
       flex-shrink: 0;
     }
 
-    /* ===== QUESTION BOARD — fixed height, not flex-grow ===== */
+    /* ===== QUESTION BOARD ===== */
     #question-board {
       background: var(--bg2);
       border: 3px solid var(--primary);
@@ -736,7 +954,7 @@
       box-shadow: 0 0 12px var(--secondary);
     }
 
-    /* ===== BUZZ BANNER — who buzzed first ===== */
+    /* ===== BUZZ BANNER ===== */
     #buzz-banner {
       position: fixed;
       top: 0;
@@ -768,28 +986,57 @@
 
     #buzz-banner.team-a #buzz-banner-inner {
       background: linear-gradient(135deg, #2563eb, #1d4ed8);
-      box-shadow: 0 0 60px rgba(37, 99, 235, 0.6), 0 8px 32px rgba(0,0,0,0.3);
+      box-shadow: 0 0 60px rgba(37, 99, 235, 0.6), 0 8px 32px rgba(0, 0, 0, 0.3);
     }
 
     #buzz-banner.team-b #buzz-banner-inner {
       background: linear-gradient(135deg, #f8d13e, #c9a318);
       color: #1e293b;
-      box-shadow: 0 0 60px rgba(248, 209, 62, 0.6), 0 8px 32px rgba(0,0,0,0.3);
+      box-shadow: 0 0 60px rgba(248, 209, 62, 0.6), 0 8px 32px rgba(0, 0, 0, 0.3);
     }
 
     @keyframes bannerFlash {
-      0%   { background: rgba(0,0,0,0.5); }
-      40%  { background: rgba(0,0,0,0.3); }
-      100% { background: rgba(0,0,0,0); }
+      0% {
+        background: rgba(0, 0, 0, 0.5);
+      }
+
+      40% {
+        background: rgba(0, 0, 0, 0.3);
+      }
+
+      100% {
+        background: rgba(0, 0, 0, 0);
+      }
     }
 
     @keyframes bannerPop {
-      0%   { transform: scale(0.3) translateY(20px); opacity: 0; }
-      20%  { transform: scale(1.1) translateY(0); opacity: 1; }
-      35%  { transform: scale(0.95); }
-      50%  { transform: scale(1.02); opacity: 1; }
-      80%  { opacity: 1; }
-      100% { transform: scale(1); opacity: 0; }
+      0% {
+        transform: scale(0.3) translateY(20px);
+        opacity: 0;
+      }
+
+      20% {
+        transform: scale(1.1) translateY(0);
+        opacity: 1;
+      }
+
+      35% {
+        transform: scale(0.95);
+      }
+
+      50% {
+        transform: scale(1.02);
+        opacity: 1;
+      }
+
+      80% {
+        opacity: 1;
+      }
+
+      100% {
+        transform: scale(1);
+        opacity: 0;
+      }
     }
 
     /* ===== BACKGROUND PARTICLES ===== */
@@ -804,83 +1051,490 @@
 
 <body>
 
-  <canvas id="particles-canvas"></canvas>
+  <!-- =====================================================
+       3D INTRO OVERLAY
+       ===================================================== -->
+  <div id="intro-overlay">
+    <canvas id="intro-canvas"></canvas>
 
-  <div class="corner-dec tl"></div>
-  <div class="corner-dec tr"></div>
-  <div class="corner-dec bl"></div>
-  <div class="corner-dec br"></div>
+    <div id="intro-content">
+      <div id="intro-text">
+        <h1>Welcome to<br><span class="accent">AEE Annual<br>Conference</span></h1>
+        <p>Done by VINSMOKE</p>
+      </div>
+    </div>
 
-  <div id="logo-wrap" title="Click &amp; drag to rotate">
-    <canvas id="logo-canvas" width="130" height="130" style="width:130px;height:130px;border-radius:10px;"></canvas>
-  </div>
+    <div id="coord-display">32.042355°N &nbsp; 35.900693°E</div>
 
-  <div id="x-overlay">
-    <div id="x-symbol">✗</div>
-  </div>
+    <div id="marker-ping">
+      <div class="ping-ring"></div>
+      <div class="ping-ring"></div>
+      <div class="ping-center"></div>
+    </div>
 
-  <div id="check-overlay">
-    <div id="check-symbol">✓</div>
-  </div>
-
-  <div id="buzzer-flash"></div>
-
-  <div id="header">
-    <div contenteditable="true" id="game-title" spellcheck="false">Energy Awareness Competition</div>
-    <div id="stage-wrap">
-      <span class="stage-label">Stage</span>
-      <button class="stage-btn active" id="stage1-btn" onclick="setStage(1)">1</button>
-      <button class="stage-btn" id="stage2-btn" onclick="setStage(2)">2</button>
+    <div id="intro-loader">
+      <div class="loader-dot"></div>
+      <div class="loader-dot"></div>
+      <div class="loader-dot"></div>
     </div>
   </div>
 
-  <div id="main">
+  <!-- =====================================================
+       MAIN WEBSITE (hidden until intro finishes)
+       ===================================================== -->
+  <div id="main-website">
+    <canvas id="particles-canvas"></canvas>
 
-    <div class="team-panel left">
-      <input class="team-name-input" id="team-a-name" value="TEAM ALPHA" maxlength="16" spellcheck="false">
-      <div class="score-display" id="score-a">0</div>
+    <div class="corner-dec tl"></div>
+    <div class="corner-dec tr"></div>
+    <div class="corner-dec bl"></div>
+    <div class="corner-dec br"></div>
 
-      <div class="buzzer-indicator" id="buzz-a"></div>
+    <div id="logo-wrap" title="Click &amp; drag to rotate">
+      <canvas id="logo-canvas" width="130" height="130"
+        style="width:130px;height:130px;border-radius:10px;"></canvas>
     </div>
 
-    <div id="center-panel">
-      <div id="round-badge">Round <span id="round-num">0</span> &nbsp;·&nbsp; Stage <span id="round-stage">1</span>
+    <div id="x-overlay">
+      <div id="x-symbol">✗</div>
+    </div>
+
+    <div id="check-overlay">
+      <div id="check-symbol">✓</div>
+    </div>
+
+    <div id="buzzer-flash"></div>
+
+    <div id="header">
+      <div contenteditable="true" id="game-title" spellcheck="false">Energy Awareness Competition</div>
+      <div id="stage-wrap">
+        <span class="stage-label">Stage</span>
+        <button class="stage-btn active" id="stage1-btn" onclick="setStage(1)">1</button>
+        <button class="stage-btn" id="stage2-btn" onclick="setStage(2)">2</button>
+      </div>
+    </div>
+
+    <div id="main">
+
+      <div class="team-panel left">
+        <input class="team-name-input" id="team-a-name" value="TEAM ALPHA" maxlength="16" spellcheck="false">
+        <div class="score-display" id="score-a">0</div>
+        <div class="buzzer-indicator" id="buzz-a"></div>
       </div>
 
-      <div id="question-board">
-        <div id="question-waiting">
+      <div id="center-panel">
+        <div id="round-badge">Round <span id="round-num">0</span> &nbsp;·&nbsp; Stage <span
+            id="round-stage">1</span>
         </div>
-        <div id="question-text"></div>
-        <div id="answer-reveal"></div>
-      </div>
 
-      <div id="timer-wrap">
-        <div id="timer-label">Time Remaining</div>
-        <div id="timer-display">10</div>
-        <div id="timer-bar-wrap">
-          <div id="timer-bar"></div>
+        <div id="question-board">
+          <div id="question-waiting">
+          </div>
+          <div id="question-text"></div>
+          <div id="answer-reveal"></div>
         </div>
+
+        <div id="timer-wrap">
+          <div id="timer-label">Time Remaining</div>
+          <div id="timer-display">10</div>
+          <div id="timer-bar-wrap">
+            <div id="timer-bar"></div>
+          </div>
+        </div>
+
+
       </div>
 
+      <div class="team-panel right">
+        <input class="team-name-input" id="team-b-name" value="TEAM BRAVO" maxlength="16" spellcheck="false">
+        <div class="score-display" id="score-b">0</div>
+        <div class="buzzer-indicator" id="buzz-b"></div>
+      </div>
 
     </div>
 
-    <div class="team-panel right">
-      <input class="team-name-input" id="team-b-name" value="TEAM BRAVO" maxlength="16" spellcheck="false">
-      <div class="score-display" id="score-b">0</div>
-
-      <div class="buzzer-indicator" id="buzz-b"></div>
+    <div id="buzz-banner">
+      <div id="buzz-banner-inner"></div>
     </div>
-
   </div>
 
-  <div id="buzz-banner">
-    <div id="buzz-banner-inner"></div>
-  </div>
-
-
-
+  <!-- =====================================================
+       THREE.JS (shared by intro + logo)
+       ===================================================== -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <!-- =====================================================
+       3D INTRO SCRIPT
+       ===================================================== -->
+  <script>
+    (function () {
+      'use strict';
+
+      const canvas = document.getElementById('intro-canvas');
+      const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.setClearColor(0x030014);
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.2;
+
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 2000);
+      camera.position.set(0, 0, 3.2);
+
+      // ---- STARFIELD ----
+      const starCount = 2500;
+      const starGeo = new THREE.BufferGeometry();
+      const starPos = new Float32Array(starCount * 3);
+      const starSizes = new Float32Array(starCount);
+      for (let i = 0; i < starCount; i++) {
+        const r = 50 + Math.random() * 450;
+        const theta = Math.random() * Math.PI * 2;
+        const phi = Math.acos(2 * Math.random() - 1);
+        starPos[i * 3] = r * Math.sin(phi) * Math.cos(theta);
+        starPos[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
+        starPos[i * 3 + 2] = r * Math.cos(phi);
+        starSizes[i] = Math.random() * 2 + 0.5;
+      }
+      starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+      starGeo.setAttribute('size', new THREE.BufferAttribute(starSizes, 1));
+
+      const starMat = new THREE.PointsMaterial({
+        color: 0xffffff,
+        size: 1.5,
+        sizeAttenuation: true,
+        transparent: true,
+        opacity: 0.8,
+      });
+      const stars = new THREE.Points(starGeo, starMat);
+      scene.add(stars);
+
+      // ---- EARTH ----
+      const textureLoader = new THREE.TextureLoader();
+
+      // Earth sphere
+      const earthGeo = new THREE.SphereGeometry(1, 64, 64);
+      const earthMat = new THREE.MeshPhongMaterial({
+        color: 0x2255aa,
+        emissive: 0x112244,
+        shininess: 25,
+        transparent: false,
+      });
+      const earth = new THREE.Mesh(earthGeo, earthMat);
+      scene.add(earth);
+
+      // Load real earth texture
+      textureLoader.load(
+        'https://unpkg.com/three-globe@2.31.1/example/img/earth-blue-marble.jpg',
+        function (texture) {
+          earthMat.map = texture;
+          earthMat.color.set(0xffffff);
+          earthMat.emissive.set(0x111111);
+          earthMat.needsUpdate = true;
+        },
+        undefined,
+        function () {
+          // Fallback: use procedural color if texture fails
+          console.warn('Earth texture fallback');
+        }
+      );
+
+      // Also bump map for realism
+      textureLoader.load(
+        'https://unpkg.com/three-globe@2.31.1/example/img/earth-topology.png',
+        function (bumpTex) {
+          earthMat.bumpMap = bumpTex;
+          earthMat.bumpScale = 0.04;
+          earthMat.needsUpdate = true;
+        }
+      );
+
+      // ---- ATMOSPHERE GLOW ----
+      const atmosGeo = new THREE.SphereGeometry(1.05, 64, 64);
+      const atmosMat = new THREE.ShaderMaterial({
+        vertexShader: `
+          varying vec3 vNormal;
+          varying vec3 vPosition;
+          void main() {
+            vNormal = normalize(normalMatrix * normal);
+            vPosition = (modelViewMatrix * vec4(position, 1.0)).xyz;
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+          }
+        `,
+        fragmentShader: `
+          varying vec3 vNormal;
+          varying vec3 vPosition;
+          void main() {
+            float intensity = pow(0.72 - dot(vNormal, vec3(0.0, 0.0, 1.0)), 2.5);
+            vec3 color = vec3(0.14, 0.71, 0.61);
+            gl_FragColor = vec4(color, intensity * 0.65);
+          }
+        `,
+        blending: THREE.AdditiveBlending,
+        side: THREE.BackSide,
+        transparent: true,
+        depthWrite: false,
+      });
+      const atmosphere = new THREE.Mesh(atmosGeo, atmosMat);
+      scene.add(atmosphere);
+
+      // ---- OUTER GLOW (larger) ----
+      const outerGlowGeo = new THREE.SphereGeometry(1.18, 64, 64);
+      const outerGlowMat = new THREE.ShaderMaterial({
+        vertexShader: `
+          varying vec3 vNormal;
+          void main() {
+            vNormal = normalize(normalMatrix * normal);
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+          }
+        `,
+        fragmentShader: `
+          varying vec3 vNormal;
+          void main() {
+            float intensity = pow(0.5 - dot(vNormal, vec3(0.0, 0.0, 1.0)), 3.0);
+            vec3 color = vec3(0.08, 0.45, 0.55);
+            gl_FragColor = vec4(color, intensity * 0.3);
+          }
+        `,
+        blending: THREE.AdditiveBlending,
+        side: THREE.BackSide,
+        transparent: true,
+        depthWrite: false,
+      });
+      const outerGlow = new THREE.Mesh(outerGlowGeo, outerGlowMat);
+      scene.add(outerGlow);
+
+      // ---- LIGHTING ----
+      const ambientLight = new THREE.AmbientLight(0x334466, 0.6);
+      scene.add(ambientLight);
+
+      const sunLight = new THREE.DirectionalLight(0xfff5e0, 1.8);
+      sunLight.position.set(5, 3, 5);
+      scene.add(sunLight);
+
+      const rimLight = new THREE.DirectionalLight(0x4ae8cc, 0.4);
+      rimLight.position.set(-3, -1, -3);
+      scene.add(rimLight);
+
+      // ---- MARKER at (32.042355, 35.900693) ----
+      const TARGET_LAT = 32.042355;
+      const TARGET_LON = 35.900693;
+
+      function latLonToVec3(lat, lon, radius) {
+        const phi = (90 - lat) * (Math.PI / 180);
+        const theta = (lon + 180) * (Math.PI / 180);
+        return new THREE.Vector3(
+          -radius * Math.sin(phi) * Math.cos(theta),
+          radius * Math.cos(phi),
+          radius * Math.sin(phi) * Math.sin(theta)
+        );
+      }
+
+      const markerPos3D = latLonToVec3(TARGET_LAT, TARGET_LON, 1.02);
+
+      // Small glowing sphere marker on Earth
+      const markerGeo = new THREE.SphereGeometry(0.018, 16, 16);
+      const markerMat = new THREE.MeshBasicMaterial({
+        color: 0x4ae8cc,
+        transparent: true,
+        opacity: 0,
+      });
+      const marker3D = new THREE.Mesh(markerGeo, markerMat);
+      marker3D.position.copy(markerPos3D);
+      earth.add(marker3D);
+
+      // Marker ring
+      const ringGeo = new THREE.RingGeometry(0.025, 0.035, 32);
+      const ringMat = new THREE.MeshBasicMaterial({
+        color: 0x4ae8cc,
+        transparent: true,
+        opacity: 0,
+        side: THREE.DoubleSide
+      });
+      const markerRing = new THREE.Mesh(ringGeo, ringMat);
+      markerRing.position.copy(markerPos3D);
+      markerRing.lookAt(new THREE.Vector3(0, 0, 0));
+      earth.add(markerRing);
+
+      // ---- ANIMATION STATE ----
+      let phase = 'intro'; // 'intro' → 'zoom' → 'done'
+      let elapsed = 0;
+      const INTRO_DURATION = 3.0; // seconds before zoom starts
+      const ZOOM_DURATION = 3.0; // seconds for zoom animation
+      const clock = new THREE.Clock();
+
+      // Position Earth slightly to the right
+      earth.position.set(0.6, 0, 0);
+      atmosphere.position.copy(earth.position);
+      outerGlow.position.copy(earth.position);
+
+      // Camera start
+      const camStartPos = new THREE.Vector3(0, 0, 3.2);
+      const camStartLookAt = new THREE.Vector3(0.6, 0, 0);
+
+      // Compute the target Earth rotation that places Jordan facing the camera.
+      // The marker is at local position markerPos3D on the sphere.
+      // We need to rotate Earth on Y so that markerPos3D ends up pointing toward +Z (camera direction).
+      // The local marker theta angle (around Y) determines which Y rotation brings it front-facing.
+      const markerTheta = Math.atan2(markerPos3D.x, markerPos3D.z);
+      // Target rotation: rotate Earth so the marker's longitude faces the camera
+      // We want the marker's local Z to align with world +Z, so targetRotY = -markerTheta
+      const targetEarthRotY = -markerTheta;
+
+      // The camera zoom endpoint: look at the marker's position on the sphere surface (in world coords)
+      // After Earth rotates to targetEarthRotY, the marker world position will be:
+      function getMarkerWorldPosAtRotation(rotY) {
+        const cosR = Math.cos(rotY);
+        const sinR = Math.sin(rotY);
+        // Rotate markerPos3D around Y axis
+        const x = markerPos3D.x * cosR + markerPos3D.z * sinR;
+        const y = markerPos3D.y;
+        const z = -markerPos3D.x * sinR + markerPos3D.z * cosR;
+        // Add Earth's world offset
+        return new THREE.Vector3(x + earth.position.x, y + earth.position.y, z + earth.position.z);
+      }
+
+      // Pre-compute where the marker will be when Earth faces camera
+      const finalMarkerWorldPos = getMarkerWorldPosAtRotation(targetEarthRotY);
+      // Camera end position: slightly in front of the marker, pulled back along its normal
+      const markerNormal = finalMarkerWorldPos.clone().sub(earth.position).normalize();
+      const camEndPos = earth.position.clone().add(markerNormal.clone().multiplyScalar(1.65));
+      const camEndLookAt = finalMarkerWorldPos.clone();
+
+      // Smooth easing
+      function easeInOutCubic(t) {
+        return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+      }
+
+      function easeOutExpo(t) {
+        return t === 1 ? 1 : 1 - Math.pow(2, -10 * t);
+      }
+
+      // ---- RESIZE ----
+      function onResize() {
+        const w = window.innerWidth;
+        const h = window.innerHeight;
+        camera.aspect = w / h;
+        camera.updateProjectionMatrix();
+        renderer.setSize(w, h);
+      }
+      window.addEventListener('resize', onResize);
+
+      // ---- RENDER LOOP ----
+      let introFinished = false;
+      let zoomStartRotation = null;
+
+      function animate() {
+        if (introFinished) return;
+        requestAnimationFrame(animate);
+
+        const delta = clock.getDelta();
+        elapsed += delta;
+
+        // Rotate Earth during intro
+        if (phase === 'intro') {
+          earth.rotation.y += delta * 0.25;
+        }
+
+        // Star twinkle
+        stars.rotation.y += delta * 0.005;
+        stars.rotation.x += delta * 0.002;
+
+        if (phase === 'intro' && elapsed >= INTRO_DURATION) {
+          phase = 'zoom';
+          elapsed = 0;
+          zoomStartRotation = earth.rotation.y;
+
+          // Show coordinate display
+          document.getElementById('coord-display').classList.add('show');
+
+          // Show marker
+          markerMat.opacity = 1;
+          ringMat.opacity = 0.8;
+        }
+
+        if (phase === 'zoom') {
+          const t = Math.min(elapsed / ZOOM_DURATION, 1);
+          const eased = easeInOutCubic(t);
+
+          // 1) Rotate Earth so Jordan faces the camera
+          //    Lerp from the rotation at zoom start to the target rotation
+          //    Handle shortest path rotation
+          let rotDiff = targetEarthRotY - zoomStartRotation;
+          // Normalize to [-PI, PI] for shortest path
+          while (rotDiff > Math.PI) rotDiff -= Math.PI * 2;
+          while (rotDiff < -Math.PI) rotDiff += Math.PI * 2;
+          earth.rotation.y = zoomStartRotation + rotDiff * eased;
+
+          // 2) Move camera toward the marker
+          camera.position.lerpVectors(camStartPos, camEndPos, eased);
+
+          // 3) Camera look-at: smoothly transition to look at the marker
+          const lookTarget = new THREE.Vector3();
+          lookTarget.lerpVectors(camStartLookAt, camEndLookAt, eased);
+          camera.lookAt(lookTarget);
+
+          // Pulse marker ring
+          const ringScale = 1 + Math.sin(elapsed * 6) * 0.3;
+          markerRing.scale.set(ringScale, ringScale, 1);
+
+          // At the end of zoom
+          if (t >= 1) {
+            phase = 'done';
+            finishIntro();
+          }
+        }
+
+        // Sync atmosphere and outer glow with earth
+        atmosphere.position.copy(earth.position);
+        atmosphere.rotation.copy(earth.rotation);
+        outerGlow.position.copy(earth.position);
+
+        renderer.render(scene, camera);
+      }
+
+      animate();
+
+      // ---- FINISH INTRO ----
+      function finishIntro() {
+        introFinished = true;
+
+        // Wait a beat then transition
+        setTimeout(() => {
+          const overlay = document.getElementById('intro-overlay');
+          overlay.classList.add('fade-out');
+
+          // Show main website
+          const mainWebsite = document.getElementById('main-website');
+
+          setTimeout(() => {
+            mainWebsite.classList.add('revealed');
+            // Allow scrolling again
+            document.body.style.overflow = '';
+          }, 300);
+
+          setTimeout(() => {
+            overlay.classList.add('hidden');
+            // Clean up Three.js resources
+            renderer.dispose();
+          }, 1500);
+        }, 600);
+      }
+
+      // Skip intro on click
+      document.getElementById('intro-overlay').addEventListener('click', function () {
+        if (phase !== 'done') {
+          phase = 'done';
+          finishIntro();
+        }
+      });
+
+    })();
+  </script>
+
+  <!-- =====================================================
+       LOGO 3D (existing)
+       ===================================================== -->
   <script>
     (function () {
       const canvas = document.getElementById('logo-canvas');
@@ -929,7 +1583,6 @@
 
           model.traverse(function (obj) {
             if (obj.isMesh) {
-              // Apply the darker matte Material
               obj.material = brandMaterial;
             }
           });
@@ -947,7 +1600,6 @@
           camera.updateProjectionMatrix();
         }, undefined, function (err) {
           console.warn('GLB load error:', err);
-          // Fallback shape if file is missing
           const fallback = new THREE.Mesh(
             new THREE.CylinderGeometry(1, 1, 0.4, 6),
             brandMaterial
@@ -966,16 +1618,19 @@
     })();
   </script>
 
+  <!-- =====================================================
+       GAME LOGIC (existing)
+       ===================================================== -->
   <script>
     // ============================================================
     //  STATE
     // ============================================================
-    let questionsR1 = [];   // round 1 questions
-    let questionsR2 = [];   // round 2 questions
+    let questionsR1 = [];
+    let questionsR2 = [];
     let allQuestions = [];
     let currentQuestion = null;
     let usedIndices = new Set();
-    let roundNum = 0;         // Start at 0 so first question shown becomes Round 1
+    let roundNum = 0;
     let scoreA = 0, scoreB = 0;
     let currentStage = 1;
     let questionVisible = false;
@@ -986,10 +1641,6 @@
 
     // ============================================================
     //  PARSE TEXT FILE FORMAT
-    //  Each question block:
-    //    Q: question text
-    //    A: answer text
-    //  Blocks separated by blank lines (or just sequential Q/A pairs)
     // ============================================================
     function parseTextFile(text) {
       const questions = [];
@@ -1071,7 +1722,7 @@
     }
 
     // ============================================================
-    //  STAGE — switches question pool
+    //  STAGE
     // ============================================================
     function setStage(n) {
       currentStage = n;
@@ -1093,7 +1744,6 @@
       if (!currentQuestion || questionVisible) return;
       questionVisible = true;
 
-      // Increment round counter every time a question is revealed
       roundNum++;
       document.getElementById('round-num').textContent = roundNum;
 
@@ -1179,6 +1829,7 @@
       if (delta > 0) playScoreUpSound();
       else playScoreDownSound();
     }
+
     function bumpAnim(el) {
       el.classList.add('bump');
       setTimeout(() => el.classList.remove('bump'), 200);
@@ -1188,6 +1839,9 @@
     //  KEYBOARD
     // ============================================================
     document.addEventListener('keydown', (e) => {
+      // Don't process keys during intro
+      if (document.getElementById('intro-overlay') && !document.getElementById('intro-overlay').classList.contains('hidden')) return;
+
       if (e.target.tagName === 'INPUT' && e.target.classList.contains('team-name-input')) return;
       if (e.target.contentEditable === 'true' && e.key.length === 1 && !e.ctrlKey && !e.metaKey) return;
       switch (e.key.toLowerCase()) {
@@ -1200,7 +1854,6 @@
         case 'p': updateScore('b', +1); break;
         case 'x': showWrongX(); break;
         case ' ': e.preventDefault(); nextQuestion(); break;
-        // ESP32 BLE Keyboard Buzzers
         case 'a': e.preventDefault(); handleBuzz('a'); break;
         case 'b': e.preventDefault(); handleBuzz('b'); break;
       }
@@ -1221,7 +1874,7 @@
     }
 
     // ============================================================
-    //  CORRECT CHECK  (V key / button)
+    //  CORRECT CHECK  (V key)
     // ============================================================
     let checkTimeout;
     function showCorrect() {
@@ -1267,13 +1920,11 @@
       o3.start(ctx.currentTime); o3.stop(ctx.currentTime + 0.9);
     }
 
-    // Correct answer — bright ascending fanfare
     function playCorrectSound() {
       const ctx = getCtx();
       const master = ctx.createGain();
       master.gain.setValueAtTime(1.8, ctx.currentTime);
       master.connect(ctx.destination);
-      // Three rising notes: C5 → E5 → G5
       [[523, 0], [659, 0.12], [784, 0.24]].forEach(([freq, t]) => {
         const osc = ctx.createOscillator(); const g = ctx.createGain();
         osc.connect(g); g.connect(master);
@@ -1283,7 +1934,6 @@
         g.gain.linearRampToValueAtTime(0.6, ctx.currentTime + t + 0.02);
         g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + t + 0.45);
         osc.start(ctx.currentTime + t); osc.stop(ctx.currentTime + t + 0.5);
-        // Harmonic overtone
         const osc2 = ctx.createOscillator(); const g2 = ctx.createGain();
         osc2.connect(g2); g2.connect(master);
         osc2.type = 'triangle'; osc2.frequency.value = freq * 2;
@@ -1364,26 +2014,21 @@
 
     // ============================================================
     //  ESP32 BLE KEYBOARD BUZZER SYSTEM
-    //  ESP32 acts as Bluetooth keyboard, sends 'a' or 'b' keypress
-    //  First-buzz lockout: only the first team to buzz is shown
     // ============================================================
     let buzzerLocked = false;
     let bannerTimeout;
 
     function handleBuzz(team) {
-      if (buzzerLocked) return;  // lockout — first buzz wins
+      if (buzzerLocked) return;
       buzzerLocked = true;
 
-      // Stop the main timer and start 5-second answer timer
       stopTimer();
       startTimer(5);
 
-      // Visual + audio
       flashBuzzer('team-' + team);
       animateBuzzIndicator('buzz-' + team);
       playBuzzerSound();
 
-      // Show the big "FIRST" banner
       showBuzzBanner(team);
     }
 
@@ -1431,12 +2076,13 @@
     });
   </script>
 
+  <!-- =====================================================
+       FLOATING PARTICLES (existing)
+       ===================================================== -->
   <script>
-    // ============================================================
-    //  FLOATING PARTICLES
-    // ============================================================
     (function () {
       const cvs = document.getElementById('particles-canvas');
+      if (!cvs) return;
       const ctx2d = cvs.getContext('2d');
       let W, H;
       const PARTICLE_COUNT = 80;
@@ -1453,11 +2099,11 @@
         particles.push({
           x: Math.random() * W,
           y: Math.random() * H,
-          r: Math.random() * 3 + 1,                 // radius 1–4px
-          vx: (Math.random() - 0.5) * 0.4,           // slow horizontal drift
-          vy: -(Math.random() * 0.3 + 0.05),         // gentle upward float
-          alpha: Math.random() * 0.35 + 0.15,         // visible opacity 15-50%
-          pulse: Math.random() * Math.PI * 2           // phase for twinkle
+          r: Math.random() * 3 + 1,
+          vx: (Math.random() - 0.5) * 0.4,
+          vy: -(Math.random() * 0.3 + 0.05),
+          alpha: Math.random() * 0.35 + 0.15,
+          pulse: Math.random() * Math.PI * 2
         });
       }
 
@@ -1466,19 +2112,15 @@
         const t = performance.now() * 0.001;
 
         for (const p of particles) {
-          // Move
           p.x += p.vx;
           p.y += p.vy;
 
-          // Wrap around edges
           if (p.y < -5) { p.y = H + 5; p.x = Math.random() * W; }
           if (p.x < -5) p.x = W + 5;
           if (p.x > W + 5) p.x = -5;
 
-          // Twinkle
           const glow = p.alpha + Math.sin(t * 0.8 + p.pulse) * 0.1;
 
-          // Soft glow halo
           ctx2d.shadowColor = 'rgba(36, 181, 156, 0.4)';
           ctx2d.shadowBlur = p.r * 3;
 
@@ -1488,7 +2130,6 @@
           ctx2d.fill();
         }
 
-        // Reset shadow for next frame
         ctx2d.shadowColor = 'transparent';
         ctx2d.shadowBlur = 0;
 
@@ -1497,6 +2138,7 @@
       draw();
     })();
   </script>
+
 </body>
 
 </html>
