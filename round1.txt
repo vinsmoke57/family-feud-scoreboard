@@ -1,149 +1,216 @@
 Q: What physical phenomenon enables a photovoltaic cell to generate electricity?
-A: Photovoltaic effect
+1: Thermoelectric effect
+2: Photovoltaic effect
+3: Piezoelectric effect
+4: Electromagnetic induction
+A: 2
 
 Q: In a silicon PV cell, what is the primary role of the p–n junction?
-A: Separate charge carriers using an internal electric field
+1: Absorb infrared radiation
+2: Increase cell temperature
+3: Separate charge carriers using an internal electric field
+4: Reflect unused wavelengths
+A: 3
 
 Q: Which wavelength range contributes most to crystalline silicon PV power output?
-A: Visible
+1: Ultraviolet
+2: Infrared
+3: Visible
+4: Microwave
+A: 3
 
 Q: Why does increasing PV cell temperature reduce the open-circuit voltage?
-A: Higher intrinsic carrier concentration
+1: Increased resistance in wiring
+2: Higher intrinsic carrier concentration
+3: Reduced sunlight absorption
+4: Lower current output
+A: 2
 
 Q: Which parameter defines the maximum power point (MPP) of a PV module?
-A: Product of voltage and current at the optimal operating point
+1: Short-circuit current alone
+2: Open-circuit voltage alone
+3: Product of voltage and current at the optimal operating point
+4: Module surface area
+A: 3
 
 Q: Which condition presents the highest risk of inverter overvoltage in a PV system?
-A: Cold weather with clear skies
+1: Hot and cloudy weather
+2: Cold weather with clear skies
+3: Rainy conditions
+4: High humidity at night
+A: 2
 
 Q: What is the primary benefit of bifacial PV modules?
-A: Additional energy capture from rear-side irradiance
+1: Lower manufacturing cost
+2: Reduced weight
+3: Additional energy capture from rear-side irradiance
+4: Higher voltage output
+A: 3
 
 Q: What does the DC/AC ratio represent in a grid-connected PV system?
-A: Ratio of PV array capacity to inverter capacity
+1: Ratio of PV array capacity to inverter capacity
+2: Ratio of direct current to alternating current frequency
+3: Efficiency of the solar panels
+4: Power loss in transmission
+A: 1
 
 Q: Which condition most increases mismatch losses in PV arrays?
-A: Uneven shading or module aging
+1: Uniform high irradiance
+2: Consistent module temperatures
+3: Uneven shading or module aging
+4: Clean module surfaces
+A: 3
 
 Q: Which grid issue becomes significant at high rooftop PV penetration levels?
-A: Voltage rise and reverse power flow
+1: Frequency drop
+2: Current harmonics
+3: Voltage rise and reverse power flow
+4: Transformer overheating
+A: 3
 
 Q: What is the main purpose of anti-islanding protection in PV systems?
-A: Protect utility workers and grid equipment
-
-Q: Why is PV array voltage designed with safety margins?
-A: To accommodate temperature-related voltage variation
+1: Increase energy production
+2: Protect utility workers and grid equipment
+3: Reduce system cost
+4: Improve power quality
+A: 2
 
 Q: What is the primary cause of soiling losses in PV systems?
-A: Dust and particulate accumulation on modules
+1: Bird droppings only
+2: Rain erosion
+3: Dust and particulate accumulation on modules
+4: UV degradation
+A: 3
 
 Q: Which monitoring indicator best reflects overall PV system health?
-A: Performance ratio (PR)
+1: Ambient temperature
+2: Wind speed
+3: Performance ratio (PR)
+4: Module count
+A: 3
 
 Q: What is the most common cause of PV-related fire hazards?
-A: Poor DC connections and electrical arcing
-
-Q: Why are PV strings designed to operate within a specific voltage window?
-A: To ensure compatibility with inverter MPPT limits
+1: Lightning strikes
+2: Poor DC connections and electrical arcing
+3: Overheating panels
+4: Inverter software bugs
+A: 2
 
 Q: Which factor most strongly affects annual PV energy yield?
-A: Site solar irradiance profile
-
-Q: What is the main advantage of oversizing the PV array relative to inverter capacity?
-A: Increase annual energy production
-
-Q: Which operating condition most increases inverter clipping?
-A: High irradiance during cool ambient conditions
+1: Module color
+2: Inverter brand
+3: Site solar irradiance profile
+4: Cable length
+A: 3
 
 Q: What is the primary function of bypass diodes?
-A: Reduce power loss and hot spots during partial shading
+1: Increase voltage
+2: Reduce power loss and hot spots during partial shading
+3: Store energy
+4: Convert DC to AC
+A: 2
 
 Q: Which degradation mechanism is associated with high system voltage and humidity?
-A: Potential-Induced Degradation (PID)
+1: Light-Induced Degradation (LID)
+2: Mechanical stress cracking
+3: Potential-Induced Degradation (PID)
+4: Thermal cycling fatigue
+A: 3
 
 Q: What does the temperature coefficient describe?
-A: Change in output with temperature variation
+1: Change in module weight with temperature
+2: Change in output with temperature variation
+3: Change in color with temperature
+4: Efficiency of cooling systems
+A: 2
 
 Q: Which loss is largest in desert PV installations?
-A: Soiling and temperature losses
+1: Wiring losses
+2: Inverter clipping
+3: Soiling and temperature losses
+4: Shading losses
+A: 3
 
 Q: Why is I–V curve tracing performed?
-A: Detect electrical faults and degradation
-
-Q: Which fault appears as a step change in I–V curve?
-A: Bypass diode failure
+1: Measure ambient temperature
+2: Detect electrical faults and degradation
+3: Calculate wind load
+4: Determine module weight
+A: 2
 
 Q: What is the primary role of combiner boxes in large PV systems?
-A: Aggregate string currents and provide protection
-
-Q: Which parameter is most useful for detecting inverter clipping?
-A: AC output power plateau at peak irradiance
+1: Convert DC to AC
+2: Store excess energy
+3: Aggregate string currents and provide protection
+4: Monitor weather conditions
+A: 3
 
 Q: What is the main safety concern when working on PV systems under sunlight?
-A: DC arc flash and electric shock
-
-Q: Why is grounding critical in PV installations?
-A: Prevent electrical shock and fire hazards
+1: Noise exposure
+2: UV skin damage
+3: DC arc flash and electric shock
+4: Falling debris
+A: 3
 
 Q: What is the main purpose of rapid shutdown requirements in PV systems?
-A: Protect emergency responders
+1: Improve efficiency
+2: Reduce installation time
+3: Protect emergency responders
+4: Increase power output
+A: 3
 
-Q: Which grid parameter is most affected by high PV export at distribution level?
-A: Voltage magnitude
-
-Q: What does “hosting capacity” of a distribution feeder represent?
-A: Maximum PV penetration without grid upgrades
-
-Q: Why are smart inverters increasingly required by utilities?
-A: Provide grid support functions (Volt/VAR, frequency response)
-
-Q: Which condition most contributes to voltage rise in low-voltage feeders?
-A: High PV export with high line impedance
+Q: What does "hosting capacity" of a distribution feeder represent?
+1: Number of houses on the feeder
+2: Maximum PV penetration without grid upgrades
+3: Total cable length
+4: Transformer size
+A: 2
 
 Q: Which device protects PV systems against lightning-induced voltage surges?
-A: Surge protection device (SPD)
-
-Q: Which factor most directly affects PV system degradation rate?
-A: Operating temperature and environmental stress
+1: Circuit breaker
+2: Fuse
+3: Surge protection device (SPD)
+4: Disconnect switch
+A: 3
 
 Q: What is the primary function of an MPPT algorithm?
-A: Continuously track the maximum power point
+1: Monitor panel temperature
+2: Continuously track the maximum power point
+3: Control inverter fan speed
+4: Manage battery charging
+A: 2
 
-Q: Which PV system component most influences string-level mismatch losses?
-A: Module electrical non-uniformity
-
-Q: Why is selective coordination important in PV protection design?
-A: Ensure only faulty sections are isolated
-
-Q: What phenomenon causes “hot spots” in PV modules?
-A: Partial shading combined with current mismatch
-
-Q: Which monitoring metric best indicates long-term PV plant performance?
-A: Year-to-year energy yield trend
+Q: What phenomenon causes "hot spots" in PV modules?
+1: High wind speeds
+2: Partial shading combined with current mismatch
+3: Rain accumulation
+4: Low ambient temperature
+A: 2
 
 Q: What is the primary benefit of glass–glass PV modules?
-A: Improved durability and lower degradation
-
-Q: Which condition most accelerates light-induced degradation (LID)?
-A: Initial exposure to sunlight
-
-Q: Why is cleaning frequency critical for utility-scale PV plants?
-A: Recover energy lost due to soiling
+1: Lower cost
+2: Lighter weight
+3: Improved durability and lower degradation
+4: Higher voltage
+A: 3
 
 Q: Which PV system parameter is most sensitive to partial shading?
-A: Output current
+1: Voltage
+2: Temperature
+3: Output current
+4: Frequency
+A: 3
 
 Q: What is the main cause of reverse power flow in residential PV systems?
-A: Excess PV generation exceeding local load
+1: Battery discharge
+2: Grid voltage fluctuation
+3: Excess PV generation exceeding local load
+4: Inverter malfunction
+A: 3
 
-Q: Which curve best represents PV module electrical behavior?
-A: Current–voltage (I–V) curve
-
-Q: Why are string inverters often preferred for rooftop PV systems?
-A: Better shading tolerance and modularity
-
-Q: What is the primary driver of the “duck curve” phenomenon?
-A: High midday solar PV penetration
-
-Q: Which future grid challenge is most associated with widespread PV adoption?
-A: Midday overgeneration and ramping requirements
+Q: What is the primary driver of the "duck curve" phenomenon?
+1: Wind power variability
+2: High midday solar PV penetration
+3: Electric vehicle charging
+4: Industrial load patterns
+A: 2

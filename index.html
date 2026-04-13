@@ -566,6 +566,85 @@
       display: none;
     }
 
+    /* ===== MC OPTIONS GRID (Stage 1) ===== */
+    #options-grid {
+      display: none;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      width: 92%;
+      margin-top: 8px;
+    }
+
+    #options-grid.show {
+      display: grid;
+      animation: slideDown 0.3s ease;
+    }
+
+    .option-btn {
+      background: var(--bg);
+      border: 2.5px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-family: 'Oswald', sans-serif;
+      font-size: clamp(0.85rem, 1.5vw, 1.15rem);
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: var(--text-dark);
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: left;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      position: relative;
+    }
+
+    .option-btn:hover {
+      border-color: var(--primary);
+      background: var(--primary-light);
+      transform: translateY(-1px);
+    }
+
+    .option-btn .opt-num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      background: var(--primary);
+      color: white;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.2rem;
+      flex-shrink: 0;
+    }
+
+    .option-btn.correct {
+      border-color: var(--green) !important;
+      background: rgba(29, 185, 84, 0.15) !important;
+      box-shadow: 0 0 20px rgba(29, 185, 84, 0.3);
+    }
+
+    .option-btn.correct .opt-num {
+      background: var(--green);
+    }
+
+    .option-btn.wrong {
+      border-color: var(--red) !important;
+      background: rgba(229, 57, 53, 0.15) !important;
+      box-shadow: 0 0 20px rgba(229, 57, 53, 0.3);
+    }
+
+    .option-btn.wrong .opt-num {
+      background: var(--red);
+    }
+
+    .option-btn.dimmed {
+      opacity: 0.45;
+      pointer-events: none;
+    }
+
+    /* ===== STAGE 2 ANSWER REVEAL ===== */
     #answer-reveal {
       display: none;
       background: var(--primary);
@@ -1051,9 +1130,9 @@
 
 <body>
 
-  <!-- =====================================================
+  <!-- ==============================================
        3D INTRO OVERLAY
-       ===================================================== -->
+       ============================================== -->
   <div id="intro-overlay">
     <canvas id="intro-canvas"></canvas>
 
@@ -1079,9 +1158,9 @@
     </div>
   </div>
 
-  <!-- =====================================================
+  <!-- ==============================================
        MAIN WEBSITE (hidden until intro finishes)
-       ===================================================== -->
+       ============================================== -->
   <div id="main-website">
     <canvas id="particles-canvas"></canvas>
 
@@ -1131,12 +1210,19 @@
           <div id="question-waiting">
           </div>
           <div id="question-text"></div>
+          <!-- MC Options Grid for Stage 1 -->
+          <div id="options-grid">
+            <button class="option-btn" id="opt-1" data-opt="1"><span class="opt-num">1</span><span class="opt-text"></span></button>
+            <button class="option-btn" id="opt-2" data-opt="2"><span class="opt-num">2</span><span class="opt-text"></span></button>
+            <button class="option-btn" id="opt-3" data-opt="3"><span class="opt-num">3</span><span class="opt-text"></span></button>
+            <button class="option-btn" id="opt-4" data-opt="4"><span class="opt-num">4</span><span class="opt-text"></span></button>
+          </div>
           <div id="answer-reveal"></div>
         </div>
 
         <div id="timer-wrap">
           <div id="timer-label">Time Remaining</div>
-          <div id="timer-display">10</div>
+          <div id="timer-display">20</div>
           <div id="timer-bar-wrap">
             <div id="timer-bar"></div>
           </div>
@@ -1158,14 +1244,14 @@
     </div>
   </div>
 
-  <!-- =====================================================
+  <!-- ==============================================
        THREE.JS (shared by intro + logo)
-       ===================================================== -->
+       ============================================== -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
-  <!-- =====================================================
+  <!-- ==============================================
        3D INTRO SCRIPT
-       ===================================================== -->
+       ============================================== -->
   <script>
     (function () {
       'use strict';
@@ -1212,7 +1298,6 @@
       // ---- EARTH ----
       const textureLoader = new THREE.TextureLoader();
 
-      // Earth sphere
       const earthGeo = new THREE.SphereGeometry(1, 64, 64);
       const earthMat = new THREE.MeshPhongMaterial({
         color: 0x2255aa,
@@ -1223,7 +1308,6 @@
       const earth = new THREE.Mesh(earthGeo, earthMat);
       scene.add(earth);
 
-      // Load real earth texture
       textureLoader.load(
         'https://unpkg.com/three-globe@2.31.1/example/img/earth-blue-marble.jpg',
         function (texture) {
@@ -1234,12 +1318,10 @@
         },
         undefined,
         function () {
-          // Fallback: use procedural color if texture fails
           console.warn('Earth texture fallback');
         }
       );
 
-      // Also bump map for realism
       textureLoader.load(
         'https://unpkg.com/three-globe@2.31.1/example/img/earth-topology.png',
         function (bumpTex) {
@@ -1332,7 +1414,6 @@
 
       const markerPos3D = latLonToVec3(TARGET_LAT, TARGET_LON, 1.02);
 
-      // Small glowing sphere marker on Earth
       const markerGeo = new THREE.SphereGeometry(0.018, 16, 16);
       const markerMat = new THREE.MeshBasicMaterial({
         color: 0x4ae8cc,
@@ -1343,7 +1424,6 @@
       marker3D.position.copy(markerPos3D);
       earth.add(marker3D);
 
-      // Marker ring
       const ringGeo = new THREE.RingGeometry(0.025, 0.035, 32);
       const ringMat = new THREE.MeshBasicMaterial({
         color: 0x4ae8cc,
@@ -1357,51 +1437,36 @@
       earth.add(markerRing);
 
       // ---- ANIMATION STATE ----
-      let phase = 'intro'; // 'intro' → 'zoom' → 'done'
+      let phase = 'intro';
       let elapsed = 0;
-      const INTRO_DURATION = 3.0; // seconds before zoom starts
-      const ZOOM_DURATION = 3.0; // seconds for zoom animation
+      const INTRO_DURATION = 3.0;
+      const ZOOM_DURATION = 3.0;
       const clock = new THREE.Clock();
 
-      // Position Earth slightly to the right
       earth.position.set(0.6, 0, 0);
       atmosphere.position.copy(earth.position);
       outerGlow.position.copy(earth.position);
 
-      // Camera start
       const camStartPos = new THREE.Vector3(0, 0, 3.2);
       const camStartLookAt = new THREE.Vector3(0.6, 0, 0);
 
-      // Compute the target Earth rotation that places Jordan facing the camera.
-      // The marker is at local position markerPos3D on the sphere.
-      // We need to rotate Earth on Y so that markerPos3D ends up pointing toward +Z (camera direction).
-      // The local marker theta angle (around Y) determines which Y rotation brings it front-facing.
       const markerTheta = Math.atan2(markerPos3D.x, markerPos3D.z);
-      // Target rotation: rotate Earth so the marker's longitude faces the camera
-      // We want the marker's local Z to align with world +Z, so targetRotY = -markerTheta
       const targetEarthRotY = -markerTheta;
 
-      // The camera zoom endpoint: look at the marker's position on the sphere surface (in world coords)
-      // After Earth rotates to targetEarthRotY, the marker world position will be:
       function getMarkerWorldPosAtRotation(rotY) {
         const cosR = Math.cos(rotY);
         const sinR = Math.sin(rotY);
-        // Rotate markerPos3D around Y axis
         const x = markerPos3D.x * cosR + markerPos3D.z * sinR;
         const y = markerPos3D.y;
         const z = -markerPos3D.x * sinR + markerPos3D.z * cosR;
-        // Add Earth's world offset
         return new THREE.Vector3(x + earth.position.x, y + earth.position.y, z + earth.position.z);
       }
 
-      // Pre-compute where the marker will be when Earth faces camera
       const finalMarkerWorldPos = getMarkerWorldPosAtRotation(targetEarthRotY);
-      // Camera end position: slightly in front of the marker, pulled back along its normal
       const markerNormal = finalMarkerWorldPos.clone().sub(earth.position).normalize();
       const camEndPos = earth.position.clone().add(markerNormal.clone().multiplyScalar(1.65));
       const camEndLookAt = finalMarkerWorldPos.clone();
 
-      // Smooth easing
       function easeInOutCubic(t) {
         return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
       }
@@ -1410,7 +1475,6 @@
         return t === 1 ? 1 : 1 - Math.pow(2, -10 * t);
       }
 
-      // ---- RESIZE ----
       function onResize() {
         const w = window.innerWidth;
         const h = window.innerHeight;
@@ -1420,7 +1484,6 @@
       }
       window.addEventListener('resize', onResize);
 
-      // ---- RENDER LOOP ----
       let introFinished = false;
       let zoomStartRotation = null;
 
@@ -1431,12 +1494,10 @@
         const delta = clock.getDelta();
         elapsed += delta;
 
-        // Rotate Earth during intro
         if (phase === 'intro') {
           earth.rotation.y += delta * 0.25;
         }
 
-        // Star twinkle
         stars.rotation.y += delta * 0.005;
         stars.rotation.x += delta * 0.002;
 
@@ -1445,10 +1506,8 @@
           elapsed = 0;
           zoomStartRotation = earth.rotation.y;
 
-          // Show coordinate display
           document.getElementById('coord-display').classList.add('show');
 
-          // Show marker
           markerMat.opacity = 1;
           ringMat.opacity = 0.8;
         }
@@ -1457,35 +1516,26 @@
           const t = Math.min(elapsed / ZOOM_DURATION, 1);
           const eased = easeInOutCubic(t);
 
-          // 1) Rotate Earth so Jordan faces the camera
-          //    Lerp from the rotation at zoom start to the target rotation
-          //    Handle shortest path rotation
           let rotDiff = targetEarthRotY - zoomStartRotation;
-          // Normalize to [-PI, PI] for shortest path
           while (rotDiff > Math.PI) rotDiff -= Math.PI * 2;
           while (rotDiff < -Math.PI) rotDiff += Math.PI * 2;
           earth.rotation.y = zoomStartRotation + rotDiff * eased;
 
-          // 2) Move camera toward the marker
           camera.position.lerpVectors(camStartPos, camEndPos, eased);
 
-          // 3) Camera look-at: smoothly transition to look at the marker
           const lookTarget = new THREE.Vector3();
           lookTarget.lerpVectors(camStartLookAt, camEndLookAt, eased);
           camera.lookAt(lookTarget);
 
-          // Pulse marker ring
           const ringScale = 1 + Math.sin(elapsed * 6) * 0.3;
           markerRing.scale.set(ringScale, ringScale, 1);
 
-          // At the end of zoom
           if (t >= 1) {
             phase = 'done';
             finishIntro();
           }
         }
 
-        // Sync atmosphere and outer glow with earth
         atmosphere.position.copy(earth.position);
         atmosphere.rotation.copy(earth.rotation);
         outerGlow.position.copy(earth.position);
@@ -1495,33 +1545,27 @@
 
       animate();
 
-      // ---- FINISH INTRO ----
       function finishIntro() {
         introFinished = true;
 
-        // Wait a beat then transition
         setTimeout(() => {
           const overlay = document.getElementById('intro-overlay');
           overlay.classList.add('fade-out');
 
-          // Show main website
           const mainWebsite = document.getElementById('main-website');
 
           setTimeout(() => {
             mainWebsite.classList.add('revealed');
-            // Allow scrolling again
             document.body.style.overflow = '';
           }, 300);
 
           setTimeout(() => {
             overlay.classList.add('hidden');
-            // Clean up Three.js resources
             renderer.dispose();
           }, 1500);
         }, 600);
       }
 
-      // Skip intro on click
       document.getElementById('intro-overlay').addEventListener('click', function () {
         if (phase !== 'done') {
           phase = 'done';
@@ -1532,9 +1576,9 @@
     })();
   </script>
 
-  <!-- =====================================================
+  <!-- ==============================================
        LOGO 3D (existing)
-       ===================================================== -->
+       ============================================== -->
   <script>
     (function () {
       const canvas = document.getElementById('logo-canvas');
@@ -1551,12 +1595,10 @@
       const root = new THREE.Group();
       scene.add(root);
 
-      // --- SOLID COLOR MATERIAL — exact match to title color, no lighting needed ---
       const brandMaterial = new THREE.MeshBasicMaterial({
-        color: 0x1a8a76     // Exact title color (--primary-dark), no light interaction
+        color: 0x1a8a76
       });
 
-      // Mouse-rotate state
       let isRotating = false;
       let rotStart = { x: 0, y: 0 };
       let rotCurrent = { x: 0, y: 0.3 };
@@ -1573,7 +1615,6 @@
       });
       document.addEventListener('mouseup', () => { isRotating = false; });
 
-      // Load GLB
       const loaderScript = document.createElement('script');
       loaderScript.src = 'https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js';
       loaderScript.onload = function () {
@@ -1618,31 +1659,70 @@
     })();
   </script>
 
-  <!-- =====================================================
-       GAME LOGIC (existing)
-       ===================================================== -->
+  <!-- ==============================================
+       GAME LOGIC (FULLY UPDATED)
+       ============================================== -->
   <script>
-    // ============================================================
+    // ================================================================
     //  STATE
-    // ============================================================
+    // ================================================================
     let questionsR1 = [];
     let questionsR2 = [];
     let allQuestions = [];
     let currentQuestion = null;
-    let usedIndices = new Set();
+    let usedIndicesR1 = new Set();
+    let usedIndicesR2 = new Set();
     let roundNum = 0;
     let scoreA = 0, scoreB = 0;
     let currentStage = 1;
     let questionVisible = false;
     let answerVisible = false;
+    let answerLocked = false; // prevents multiple MC answers
     let timerInterval = null;
-    let timerSeconds = 10;
-    const TIMER_TOTAL = 10;
+    let timerSeconds = 20;
+    const QUESTION_TIMER = 20;
+    const BUZZER_TIMER = 7;
 
-    // ============================================================
-    //  PARSE TEXT FILE FORMAT
-    // ============================================================
-    function parseTextFile(text) {
+    // ================================================================
+    //  PARSE TEXT FILE FORMATS
+    // ================================================================
+
+    // --- Stage 1: Multiple Choice format ---
+    // Q: [text]
+    // 1: [opt1]
+    // 2: [opt2]
+    // 3: [opt3]
+    // 4: [opt4]
+    // A: [1-4]
+    function parseMCFile(text) {
+      const questions = [];
+      const lines = text.split('\n');
+      let currentQ = null;
+      for (let raw of lines) {
+        const line = raw.trim();
+        if (line.toUpperCase().startsWith('Q:')) {
+          currentQ = { question: line.slice(2).trim(), options: ['', '', '', ''], correctIndex: 0 };
+        } else if (/^1:/.test(line) && currentQ) {
+          currentQ.options[0] = line.slice(2).trim();
+        } else if (/^2:/.test(line) && currentQ) {
+          currentQ.options[1] = line.slice(2).trim();
+        } else if (/^3:/.test(line) && currentQ) {
+          currentQ.options[2] = line.slice(2).trim();
+        } else if (/^4:/.test(line) && currentQ) {
+          currentQ.options[3] = line.slice(2).trim();
+        } else if (line.toUpperCase().startsWith('A:') && currentQ) {
+          currentQ.correctIndex = parseInt(line.slice(2).trim(), 10);
+          questions.push(currentQ);
+          currentQ = null;
+        }
+      }
+      return questions;
+    }
+
+    // --- Stage 2: Classic Q/A format ---
+    // Q: [text]
+    // A: [text answer]
+    function parseQAFile(text) {
       const questions = [];
       const lines = text.split('\n');
       let currentQ = null;
@@ -1659,51 +1739,54 @@
       return questions;
     }
 
-    // ============================================================
+    // ================================================================
     //  LOAD QUESTIONS FROM TEXT FILES
-    // ============================================================
+    // ================================================================
     async function loadQuestions() {
-      const fallback = [
-        { question: "Name something you find in a kitchen", answer: "Refrigerator" },
-        { question: "Name a popular sport", answer: "Soccer / Football" },
-        { question: "Name something people do on weekends", answer: "Sleep in" },
-        { question: "Name a reason people are late to work", answer: "Traffic" },
-        { question: "Name something you take on vacation", answer: "Clothes / Luggage" },
+      const fallbackMC = [
+        { question: "What is the unit of electrical power?", options: ["Volt", "Watt", "Ampere", "Ohm"], correctIndex: 2 },
+        { question: "Which planet is closest to the Sun?", options: ["Venus", "Mercury", "Mars", "Earth"], correctIndex: 2 },
+      ];
+      const fallbackQA = [
+        { question: "What does PV stand for?", answer: "Photovoltaic" },
+        { question: "What is the chemical symbol for water?", answer: "H₂O" },
       ];
 
       try {
         const r1 = await fetch('round1.txt');
-        if (r1.ok) questionsR1 = parseTextFile(await r1.text());
+        if (r1.ok) questionsR1 = parseMCFile(await r1.text());
       } catch (e) { }
 
       try {
         const r2 = await fetch('round2.txt');
-        if (r2.ok) questionsR2 = parseTextFile(await r2.text());
+        if (r2.ok) questionsR2 = parseQAFile(await r2.text());
       } catch (e) { }
 
-      if (questionsR1.length === 0 && questionsR2.length === 0) {
-        questionsR1 = fallback;
-        questionsR2 = fallback;
-      }
-      if (questionsR1.length === 0) questionsR1 = questionsR2;
-      if (questionsR2.length === 0) questionsR2 = questionsR1;
+      if (questionsR1.length === 0) questionsR1 = fallbackMC;
+      if (questionsR2.length === 0) questionsR2 = fallbackQA;
 
       allQuestions = questionsR1;
       pickNextQuestion();
     }
 
+    function getUsedIndices() {
+      return currentStage === 1 ? usedIndicesR1 : usedIndicesR2;
+    }
+
     function pickNextQuestion() {
-      if (usedIndices.size >= allQuestions.length) {
-        usedIndices.clear();
+      const usedSet = getUsedIndices();
+      if (usedSet.size >= allQuestions.length) {
+        usedSet.clear();
       }
       let idx;
       const max = allQuestions.length;
       do { idx = Math.floor(Math.random() * max); }
-      while (usedIndices.has(idx) && usedIndices.size < max);
-      usedIndices.add(idx);
+      while (usedSet.has(idx) && usedSet.size < max);
+      usedSet.add(idx);
       currentQuestion = allQuestions[idx];
       questionVisible = false;
       answerVisible = false;
+      answerLocked = false;
     }
 
     function nextQuestion() {
@@ -1712,37 +1795,48 @@
       document.getElementById('question-waiting').style.display = 'flex';
       document.getElementById('question-text').style.display = 'none';
       document.getElementById('answer-reveal').style.display = 'none';
+      document.getElementById('options-grid').classList.remove('show');
       document.getElementById('timer-wrap').style.display = 'none';
       const disp = document.getElementById('timer-display');
       const bar = document.getElementById('timer-bar');
       disp.classList.remove('urgent');
       bar.classList.remove('urgent');
       bar.style.width = '100%';
-      disp.textContent = TIMER_TOTAL;
+      disp.textContent = QUESTION_TIMER;
+
+      // Reset option button states
+      resetOptionButtons();
     }
 
-    // ============================================================
+    function resetOptionButtons() {
+      for (let i = 1; i <= 4; i++) {
+        const btn = document.getElementById('opt-' + i);
+        btn.classList.remove('correct', 'wrong', 'dimmed');
+      }
+    }
+
+    // ================================================================
     //  STAGE
-    // ============================================================
+    // ================================================================
     function setStage(n) {
       currentStage = n;
       document.getElementById('stage1-btn').classList.toggle('active', n === 1);
       document.getElementById('stage2-btn').classList.toggle('active', n === 2);
       document.getElementById('round-stage').textContent = n;
       allQuestions = n === 1 ? questionsR1 : questionsR2;
-      usedIndices.clear();
       roundNum = 0;
       document.getElementById('round-num').textContent = roundNum;
       pickNextQuestion();
       nextQuestion();
     }
 
-    // ============================================================
+    // ================================================================
     //  T → SHOW QUESTION + START TIMER + INCREMENT ROUND
-    // ============================================================
+    // ================================================================
     function showQuestion() {
       if (!currentQuestion || questionVisible) return;
       questionVisible = true;
+      answerLocked = false;
 
       roundNum++;
       document.getElementById('round-num').textContent = roundNum;
@@ -1755,14 +1849,65 @@
       qt.style.display = 'block';
       qt.style.opacity = 0;
       requestAnimationFrame(() => { qt.style.opacity = 1; });
-      startTimer();
+
+      // Stage 1: Show MC options
+      if (currentStage === 1 && currentQuestion.options) {
+        const grid = document.getElementById('options-grid');
+        resetOptionButtons();
+        for (let i = 1; i <= 4; i++) {
+          const btn = document.getElementById('opt-' + i);
+          btn.querySelector('.opt-text').textContent = currentQuestion.options[i - 1];
+        }
+        grid.classList.add('show');
+      } else {
+        document.getElementById('options-grid').classList.remove('show');
+      }
+
+      startTimer(QUESTION_TIMER);
     }
 
-    // ============================================================
-    //  Y → REVEAL ANSWER
-    // ============================================================
+    // ================================================================
+    //  STAGE 1: HANDLE MC ANSWER (keys 1-4)
+    // ================================================================
+    function handleMCAnswer(chosenNum) {
+      if (!questionVisible || answerLocked || currentStage !== 1) return;
+      if (!currentQuestion || !currentQuestion.options) return;
+      answerLocked = true;
+
+      stopTimer();
+
+      const correctNum = currentQuestion.correctIndex;
+      const isCorrect = chosenNum === correctNum;
+
+      // Highlight correct answer
+      document.getElementById('opt-' + correctNum).classList.add('correct');
+
+      // Highlight wrong if different
+      if (!isCorrect) {
+        document.getElementById('opt-' + chosenNum).classList.add('wrong');
+      }
+
+      // Dim the other options
+      for (let i = 1; i <= 4; i++) {
+        if (i !== correctNum && i !== chosenNum) {
+          document.getElementById('opt-' + i).classList.add('dimmed');
+        }
+      }
+
+      // Trigger overlay + sound
+      if (isCorrect) {
+        showCorrect();
+      } else {
+        showWrongX();
+      }
+    }
+
+    // ================================================================
+    //  Y → REVEAL ANSWER (Stage 2 only)
+    // ================================================================
     function showAnswer() {
       if (!questionVisible || answerVisible) return;
+      if (currentStage !== 2) return; // Only Stage 2
       answerVisible = true;
       stopTimer();
       const ar = document.getElementById('answer-reveal');
@@ -1772,11 +1917,11 @@
       playRevealSound();
     }
 
-    // ============================================================
+    // ================================================================
     //  TIMER
-    // ============================================================
+    // ================================================================
     function startTimer(duration) {
-      const total = duration || TIMER_TOTAL;
+      const total = duration || QUESTION_TIMER;
       timerSeconds = total;
       const wrap = document.getElementById('timer-wrap');
       const disp = document.getElementById('timer-display');
@@ -1809,9 +1954,9 @@
     }
     function stopTimer() { clearInterval(timerInterval); }
 
-    // ============================================================
+    // ================================================================
     //  SCORE
-    // ============================================================
+    // ================================================================
     function updateScore(team, delta) {
       if (team === 'a') {
         scoreA += delta;
@@ -1835,9 +1980,9 @@
       setTimeout(() => el.classList.remove('bump'), 200);
     }
 
-    // ============================================================
+    // ================================================================
     //  KEYBOARD
-    // ============================================================
+    // ================================================================
     document.addEventListener('keydown', (e) => {
       // Don't process keys during intro
       if (document.getElementById('intro-overlay') && !document.getElementById('intro-overlay').classList.contains('hidden')) return;
@@ -1856,12 +2001,17 @@
         case ' ': e.preventDefault(); nextQuestion(); break;
         case 'a': e.preventDefault(); handleBuzz('a'); break;
         case 'b': e.preventDefault(); handleBuzz('b'); break;
+        // MC answer keys (Stage 1 only)
+        case '1': if (currentStage === 1) { e.preventDefault(); handleMCAnswer(1); } break;
+        case '2': if (currentStage === 1) { e.preventDefault(); handleMCAnswer(2); } break;
+        case '3': if (currentStage === 1) { e.preventDefault(); handleMCAnswer(3); } break;
+        case '4': if (currentStage === 1) { e.preventDefault(); handleMCAnswer(4); } break;
       }
     });
 
-    // ============================================================
+    // ================================================================
     //  WRONG X
-    // ============================================================
+    // ================================================================
     let xTimeout;
     function showWrongX() {
       playWrongSound();
@@ -1873,9 +2023,9 @@
       xTimeout = setTimeout(() => overlay.classList.remove('show'), 1400);
     }
 
-    // ============================================================
+    // ================================================================
     //  CORRECT CHECK  (V key)
-    // ============================================================
+    // ================================================================
     let checkTimeout;
     function showCorrect() {
       playCorrectSound();
@@ -1887,9 +2037,9 @@
       checkTimeout = setTimeout(() => overlay.classList.remove('show'), 1400);
     }
 
-    // ============================================================
+    // ================================================================
     //  SOUNDS
-    // ============================================================
+    // ================================================================
     let audioCtx;
     function getCtx() {
       if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -2012,9 +2162,9 @@
       }
     }
 
-    // ============================================================
+    // ================================================================
     //  ESP32 BLE KEYBOARD BUZZER SYSTEM
-    // ============================================================
+    // ================================================================
     let buzzerLocked = false;
     let bannerTimeout;
 
@@ -2023,7 +2173,7 @@
       buzzerLocked = true;
 
       stopTimer();
-      startTimer(5);
+      startTimer(BUZZER_TIMER);
 
       flashBuzzer('team-' + team);
       animateBuzzIndicator('buzz-' + team);
@@ -2066,9 +2216,9 @@
       setTimeout(() => el.classList.remove('active'), 2500);
     }
 
-    // ============================================================
+    // ================================================================
     //  INIT
-    // ============================================================
+    // ================================================================
     window.addEventListener('load', () => {
       loadQuestions();
       document.addEventListener('click', () => getCtx(), { once: true });
@@ -2076,9 +2226,9 @@
     });
   </script>
 
-  <!-- =====================================================
+  <!-- ==============================================
        FLOATING PARTICLES (existing)
-       ===================================================== -->
+       ============================================== -->
   <script>
     (function () {
       const cvs = document.getElementById('particles-canvas');
