@@ -4,235 +4,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AEE Annual Conference</title>
-  <meta name="description" content="Welcome to the AEE Annual Conference — Energy Awareness Competition">
+  <title>Energy Awareness Competition</title>
   <link
-    href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@400;600;700&family=Inter:wght@400;500;600&family=Outfit:wght@300;400;600;700&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@400;600;700&family=Inter:wght@400;500;600&display=swap"
     rel="stylesheet">
   <style>
-    /* =======================================
-       INTRO OVERLAY STYLES
-       ======================================= */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    html, body {
-      overflow: hidden;
-      width: 100%;
-      height: 100%;
-    }
-
-    #intro-overlay {
-      position: fixed;
-      inset: 0;
-      z-index: 99999;
-      background: #030014;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1), transform 1.2s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    #intro-overlay.fade-out {
-      opacity: 0;
-      transform: scale(1.05);
-      pointer-events: none;
-    }
-
-    #intro-overlay.hidden {
-      display: none;
-    }
-
-    #intro-canvas {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 1;
-    }
-
-    #intro-content {
-      position: absolute;
-      inset: 0;
-      z-index: 10;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      width: 100%;
-      height: 100%;
-      padding: 0 6vw;
-      pointer-events: none;
-      background: linear-gradient(90deg, rgba(3, 0, 20, 0.7) 0%, rgba(3, 0, 20, 0.3) 35%, transparent 55%);
-    }
-
-    #intro-text {
-      max-width: 45%;
-      opacity: 0;
-      transform: translateX(-60px);
-      animation: textSlideIn 1.4s cubic-bezier(0.16, 1, 0.3, 1) 0.5s forwards;
-    }
-
-    @keyframes textSlideIn {
-      to {
-        opacity: 1;
-        transform: translateX(0);
-      }
-    }
-
-    #intro-text h1 {
-      font-family: 'Outfit', 'Bebas Neue', sans-serif;
-      font-weight: 700;
-      font-size: clamp(2rem, 4.5vw, 4.2rem);
-      line-height: 1.1;
-      color: #ffffff;
-      letter-spacing: 0.02em;
-      text-shadow: 0 0 60px rgba(36, 181, 156, 0.3), 0 0 120px rgba(36, 181, 156, 0.1);
-      margin-bottom: 20px;
-    }
-
-    #intro-text h1 .accent {
-      background: linear-gradient(135deg, #24b59c, #4ae8cc);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    #intro-text p {
-      font-family: 'Outfit', sans-serif;
-      font-weight: 300;
-      font-size: clamp(0.9rem, 1.5vw, 1.3rem);
-      color: rgba(255, 255, 255, 0.45);
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
-      opacity: 0;
-      transform: translateY(15px);
-      animation: subtitleFadeIn 1s ease 1.4s forwards;
-    }
-
-    @keyframes subtitleFadeIn {
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    /* Loading indicator */
-    #intro-loader {
-      position: absolute;
-      bottom: 40px;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      z-index: 3;
-      opacity: 0;
-      animation: loaderFadeIn 0.6s ease 2s forwards;
-    }
-
-    @keyframes loaderFadeIn {
-      to { opacity: 1; }
-    }
-
-    .loader-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: #24b59c;
-      animation: loaderPulse 1.4s ease-in-out infinite;
-    }
-
-    .loader-dot:nth-child(2) { animation-delay: 0.2s; }
-    .loader-dot:nth-child(3) { animation-delay: 0.4s; }
-
-    @keyframes loaderPulse {
-      0%, 80%, 100% { opacity: 0.2; transform: scale(0.8); }
-      40% { opacity: 1; transform: scale(1.3); }
-    }
-
-    /* Coordinate display during zoom */
-    #coord-display {
-      position: absolute;
-      bottom: 60px;
-      right: 6vw;
-      font-family: 'Outfit', monospace;
-      font-size: 0.85rem;
-      color: rgba(74, 232, 204, 0.6);
-      letter-spacing: 0.15em;
-      z-index: 3;
-      opacity: 0;
-      transition: opacity 0.6s ease;
-    }
-
-    #coord-display.show {
-      opacity: 1;
-    }
-
-    /* Marker ping animation */
-    #marker-ping {
-      position: absolute;
-      z-index: 3;
-      pointer-events: none;
-      opacity: 0;
-      transition: opacity 0.4s ease;
-    }
-
-    #marker-ping.show {
-      opacity: 1;
-    }
-
-    #marker-ping .ping-ring {
-      width: 40px;
-      height: 40px;
-      border: 2px solid rgba(74, 232, 204, 0.6);
-      border-radius: 50%;
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      animation: pingExpand 1.5s ease-out infinite;
-    }
-
-    #marker-ping .ping-ring:nth-child(2) {
-      animation-delay: 0.5s;
-    }
-
-    #marker-ping .ping-center {
-      width: 8px;
-      height: 8px;
-      background: #4ae8cc;
-      border-radius: 50%;
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      box-shadow: 0 0 15px #4ae8cc, 0 0 30px rgba(74, 232, 204, 0.4);
-    }
-
-    @keyframes pingExpand {
-      0% { width: 8px; height: 8px; opacity: 1; }
-      100% { width: 60px; height: 60px; opacity: 0; }
-    }
-
-    /* =======================================
-       MAIN WEBSITE STYLES
-       ======================================= */
-    #main-website {
-      opacity: 0;
-      transform: translateY(20px);
-      transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-      min-height: 100vh;
-    }
-
-    #main-website.revealed {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    /* === ALL EXISTING STYLES BELOW === */
     :root {
       --primary: #24b59c;
       --primary-dark: #1a8a76;
@@ -251,6 +27,12 @@
       --text-muted: #7ab8ae;
       --border: rgba(36, 181, 156, 0.22);
       --shadow: 0 4px 24px rgba(36, 181, 156, 0.13);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
 
     body {
@@ -272,7 +54,6 @@
       z-index: 0;
     }
 
-    /* ===== LOGO — fixed top-left corner, no glow, mouse-rotate ===== */
     #logo-wrap {
       position: fixed;
       top: -10px;
@@ -291,7 +72,6 @@
       border-radius: 10px;
     }
 
-    /* ===== HEADER ===== */
     #header {
       text-align: center;
       padding: 8px 180px 5px;
@@ -312,11 +92,6 @@
       width: 100%;
       text-align: center;
       line-height: 1;
-    }
-
-    #game-title:focus {
-      color: var(--primary);
-      border-bottom: 2px solid var(--secondary);
     }
 
     #stage-wrap {
@@ -353,7 +128,6 @@
       text-transform: uppercase;
     }
 
-    /* ===== MAIN LAYOUT ===== */
     #main {
       display: grid;
       grid-template-columns: 200px 1fr 200px;
@@ -365,7 +139,6 @@
       z-index: 1;
     }
 
-    /* ===== TEAM PANELS ===== */
     .team-panel {
       display: flex;
       flex-direction: column;
@@ -398,21 +171,11 @@
       width: 100%;
       cursor: pointer;
       outline: none;
-      transition: border-color 0.2s;
     }
 
-    .team-panel.left .team-name-input {
-      color: #1d4ed8;
-    }
-
-    .team-panel.right .team-name-input {
-      color: var(--secondary-dark);
-    }
-
-    .team-name-input:focus {
-      border-bottom-color: var(--secondary);
-      cursor: text;
-    }
+    .team-panel.left .team-name-input { color: #1d4ed8; }
+    .team-panel.right .team-name-input { color: var(--secondary-dark); }
+    .team-name-input:focus { border-bottom-color: var(--secondary); cursor: text; }
 
     .score-display {
       font-family: 'Bebas Neue', sans-serif;
@@ -421,28 +184,10 @@
       transition: transform 0.15s;
     }
 
-    .team-panel.left .score-display {
-      color: #2563eb;
-    }
-
-    .team-panel.right .score-display {
-      color: var(--secondary-dark);
-    }
-
-    .score-display.bump {
-      transform: scale(1.22);
-    }
-
-    .score-display.negative {
-      color: var(--red) !important;
-    }
-
-    .score-hint {
-      font-size: 0.58rem;
-      letter-spacing: 0.2em;
-      color: var(--text-muted);
-      text-transform: uppercase;
-    }
+    .team-panel.left .score-display { color: #2563eb; }
+    .team-panel.right .score-display { color: var(--secondary-dark); }
+    .score-display.bump { transform: scale(1.22); }
+    .score-display.negative { color: var(--red) !important; }
 
     .buzzer-indicator {
       width: 14px;
@@ -466,7 +211,6 @@
       box-shadow: 0 0 14px var(--secondary);
     }
 
-    /* ===== CENTER PANEL ===== */
     #center-panel {
       display: flex;
       flex-direction: column;
@@ -488,7 +232,6 @@
       flex-shrink: 0;
     }
 
-    /* ===== QUESTION BOARD ===== */
     #question-board {
       background: var(--bg2);
       border: 3px solid var(--primary);
@@ -497,7 +240,6 @@
       width: 100%;
       flex: 1;
       max-height: 52vh;
-      text-align: center;
       box-shadow: 0 0 0 5px var(--primary-light), var(--shadow);
       position: relative;
       display: flex;
@@ -506,26 +248,7 @@
       justify-content: center;
       gap: 12px;
       min-height: 0;
-      overflow: hidden;
-    }
-
-    #question-board::before,
-    #question-board::after {
-      content: '◆';
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--primary);
-      font-size: 0.9rem;
-      opacity: 0.3;
-    }
-
-    #question-board::before {
-      left: 14px;
-    }
-
-    #question-board::after {
-      right: 14px;
+      overflow-y: auto;
     }
 
     #question-waiting {
@@ -557,40 +280,65 @@
 
     #question-text {
       font-family: 'Bebas Neue', sans-serif;
-      font-size: clamp(2rem, 4vw, 3.5rem);
+      font-size: clamp(1.5rem, 3vw, 2.5rem);
       letter-spacing: 0.05em;
       color: var(--text-dark);
       line-height: 1.2;
-      padding: 0 24px;
+      padding: 0 10px;
+      text-align: center;
       transition: opacity 0.35s;
       display: none;
     }
 
-    #answer-reveal {
+    /* ===== NEW: MCQ OPTIONS GRID ===== */
+    #options-grid {
       display: none;
-      background: var(--primary);
-      border-radius: 10px;
-      padding: 14px 32px;
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: clamp(1.5rem, 3vw, 2.4rem);
-      letter-spacing: 0.08em;
-      color: white;
-      text-align: center;
-      box-shadow: 0 4px 16px rgba(36, 181, 156, 0.35);
-      animation: slideDown 0.3s ease;
-      width: 92%;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      width: 100%;
+      margin-top: 15px;
     }
 
-    @keyframes slideDown {
-      from {
-        transform: translateY(-10px);
-        opacity: 0;
-      }
+    .option-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--bg);
+      border: 2px solid var(--border);
+      padding: 12px 20px;
+      border-radius: 10px;
+      font-family: 'Inter', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: var(--text-dark);
+      transition: all 0.2s;
+    }
 
-      to {
-        transform: translateY(0);
-        opacity: 1;
-      }
+    .option-row .opt-key {
+      background: var(--primary);
+      color: white;
+      min-width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.3rem;
+      flex-shrink: 0;
+    }
+
+    .option-row.correct {
+      background: var(--green);
+      border-color: #138a3a;
+      color: white;
+      box-shadow: 0 4px 15px rgba(29, 185, 84, 0.4);
+    }
+
+    .option-row.wrong {
+      background: var(--red);
+      border-color: var(--red-bright);
+      color: white;
     }
 
     /* ===== TIMER ===== */
@@ -618,13 +366,8 @@
     }
 
     @keyframes timerPulse {
-      from {
-        transform: scale(1);
-      }
-
-      to {
-        transform: scale(1.1);
-      }
+      from { transform: scale(1); }
+      to { transform: scale(1.1); }
     }
 
     #timer-label {
@@ -654,87 +397,6 @@
       background: var(--red);
     }
 
-    /* ===== BOTTOM CONTROLS ROW ===== */
-    #bottom-row {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      flex-shrink: 0;
-      flex-wrap: wrap;
-    }
-
-    #controls-hint {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      justify-content: center;
-      opacity: 0.5;
-      font-size: 0.62rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--text-mid);
-    }
-
-    .hint-key {
-      border: 1px solid var(--primary);
-      border-radius: 4px;
-      padding: 1px 6px;
-      background: var(--primary-light);
-      color: var(--primary-dark);
-    }
-
-    #next-btn {
-      background: var(--secondary);
-      color: var(--text-dark);
-      border: none;
-      border-radius: 8px;
-      padding: 8px 22px;
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 1.1rem;
-      letter-spacing: 0.12em;
-      cursor: pointer;
-      transition: transform 0.15s, box-shadow 0.15s;
-      box-shadow: 0 4px 0 var(--secondary-dark);
-      flex-shrink: 0;
-    }
-
-    #next-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 0 var(--secondary-dark);
-    }
-
-    #next-btn:active {
-      transform: translateY(2px);
-      box-shadow: 0 2px 0 var(--secondary-dark);
-    }
-
-    /* Correct button */
-    #correct-btn {
-      background: var(--green);
-      color: white;
-      border: none;
-      border-radius: 8px;
-      padding: 8px 22px;
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 1.1rem;
-      letter-spacing: 0.12em;
-      cursor: pointer;
-      transition: transform 0.15s, box-shadow 0.15s;
-      box-shadow: 0 4px 0 #138a3a;
-      flex-shrink: 0;
-    }
-
-    #correct-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 0 #138a3a;
-    }
-
-    #correct-btn:active {
-      transform: translateY(2px);
-      box-shadow: 0 2px 0 #138a3a;
-    }
-
     /* ===== BIG X OVERLAY ===== */
     #x-overlay {
       position: fixed;
@@ -762,43 +424,17 @@
     }
 
     @keyframes xFlash {
-      0% {
-        background: rgba(255, 0, 0, 0.45);
-      }
-
-      25% {
-        background: rgba(200, 0, 0, 0.25);
-      }
-
-      100% {
-        background: rgba(150, 0, 0, 0.04);
-      }
+      0% { background: rgba(255, 0, 0, 0.45); }
+      25% { background: rgba(200, 0, 0, 0.25); }
+      100% { background: rgba(150, 0, 0, 0.04); }
     }
 
     @keyframes xPop {
-      0% {
-        transform: scale(0.1) rotate(-15deg);
-        opacity: 0;
-      }
-
-      35% {
-        transform: scale(1.2) rotate(4deg);
-        opacity: 1;
-      }
-
-      60% {
-        transform: scale(0.93) rotate(-2deg);
-      }
-
-      80% {
-        transform: scale(1.05) rotate(0deg);
-        opacity: 1;
-      }
-
-      100% {
-        transform: scale(1) rotate(0deg);
-        opacity: 0.12;
-      }
+      0% { transform: scale(0.1) rotate(-15deg); opacity: 0; }
+      35% { transform: scale(1.2) rotate(4deg); opacity: 1; }
+      60% { transform: scale(0.93) rotate(-2deg); }
+      80% { transform: scale(1.05) rotate(0deg); opacity: 1; }
+      100% { transform: scale(1) rotate(0deg); opacity: 0.12; }
     }
 
     /* ===== BIG CHECKMARK OVERLAY ===== */
@@ -828,46 +464,19 @@
     }
 
     @keyframes checkFlash {
-      0% {
-        background: rgba(0, 220, 80, 0.45);
-      }
-
-      25% {
-        background: rgba(0, 180, 60, 0.25);
-      }
-
-      100% {
-        background: rgba(0, 150, 50, 0.04);
-      }
+      0% { background: rgba(0, 220, 80, 0.45); }
+      25% { background: rgba(0, 180, 60, 0.25); }
+      100% { background: rgba(0, 150, 50, 0.04); }
     }
 
     @keyframes checkPop {
-      0% {
-        transform: scale(0.1) rotate(15deg);
-        opacity: 0;
-      }
-
-      35% {
-        transform: scale(1.2) rotate(-4deg);
-        opacity: 1;
-      }
-
-      60% {
-        transform: scale(0.93) rotate(2deg);
-      }
-
-      80% {
-        transform: scale(1.05) rotate(0deg);
-        opacity: 1;
-      }
-
-      100% {
-        transform: scale(1) rotate(0deg);
-        opacity: 0.12;
-      }
+      0% { transform: scale(0.1) rotate(15deg); opacity: 0; }
+      35% { transform: scale(1.2) rotate(-4deg); opacity: 1; }
+      60% { transform: scale(0.93) rotate(2deg); }
+      80% { transform: scale(1.05) rotate(0deg); opacity: 1; }
+      100% { transform: scale(1) rotate(0deg); opacity: 0.12; }
     }
 
-    /* Buzzer flash */
     #buzzer-flash {
       position: fixed;
       inset: 0;
@@ -877,90 +486,18 @@
       transition: opacity 0.1s;
     }
 
-    #buzzer-flash.team-a {
-      background: rgba(37, 99, 235, 0.3);
-    }
+    #buzzer-flash.team-a { background: rgba(37, 99, 235, 0.3); }
+    #buzzer-flash.team-b { background: rgba(248, 209, 62, 0.35); }
 
-    #buzzer-flash.team-b {
-      background: rgba(248, 209, 62, 0.35);
-    }
+    .corner-dec { position: fixed; width: 38px; height: 38px; opacity: 0.22; }
+    .corner-dec.tl { top: 8px; left: 8px; border-top: 2px solid var(--primary); border-left: 2px solid var(--primary); }
+    .corner-dec.tr { top: 8px; right: 8px; border-top: 2px solid var(--primary); border-right: 2px solid var(--primary); }
+    .corner-dec.bl { bottom: 8px; left: 8px; border-bottom: 2px solid var(--primary); border-left: 2px solid var(--primary); }
+    .corner-dec.br { bottom: 8px; right: 8px; border-bottom: 2px solid var(--primary); border-right: 2px solid var(--primary); }
 
-    /* Corner decorations */
-    .corner-dec {
-      position: fixed;
-      width: 38px;
-      height: 38px;
-      opacity: 0.22;
-    }
-
-    .corner-dec.tl {
-      top: 8px;
-      left: 8px;
-      border-top: 2px solid var(--primary);
-      border-left: 2px solid var(--primary);
-    }
-
-    .corner-dec.tr {
-      top: 8px;
-      right: 8px;
-      border-top: 2px solid var(--primary);
-      border-right: 2px solid var(--primary);
-    }
-
-    .corner-dec.bl {
-      bottom: 8px;
-      left: 8px;
-      border-bottom: 2px solid var(--primary);
-      border-left: 2px solid var(--primary);
-    }
-
-    .corner-dec.br {
-      bottom: 8px;
-      right: 8px;
-      border-bottom: 2px solid var(--primary);
-      border-right: 2px solid var(--primary);
-    }
-
-    #ws-status {
-      position: fixed;
-      bottom: 10px;
-      right: 12px;
-      font-size: 0.6rem;
-      letter-spacing: 0.1em;
-      opacity: 0.45;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      text-transform: uppercase;
-      color: var(--text-mid);
-      z-index: 100;
-    }
-
-    #ws-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: #aaa;
-      transition: background 0.3s;
-    }
-
-    #ws-dot.connected {
-      background: var(--primary);
-      box-shadow: 0 0 8px var(--primary);
-    }
-
-    #ws-dot.buzzing {
-      background: var(--secondary);
-      box-shadow: 0 0 12px var(--secondary);
-    }
-
-    /* ===== BUZZ BANNER ===== */
     #buzz-banner {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+      inset: 0;
       display: none;
       align-items: center;
       justify-content: center;
@@ -986,60 +523,30 @@
 
     #buzz-banner.team-a #buzz-banner-inner {
       background: linear-gradient(135deg, #2563eb, #1d4ed8);
-      box-shadow: 0 0 60px rgba(37, 99, 235, 0.6), 0 8px 32px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 0 60px rgba(37, 99, 235, 0.6), 0 8px 32px rgba(0,0,0,0.3);
     }
 
     #buzz-banner.team-b #buzz-banner-inner {
       background: linear-gradient(135deg, #f8d13e, #c9a318);
       color: #1e293b;
-      box-shadow: 0 0 60px rgba(248, 209, 62, 0.6), 0 8px 32px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 0 60px rgba(248, 209, 62, 0.6), 0 8px 32px rgba(0,0,0,0.3);
     }
 
     @keyframes bannerFlash {
-      0% {
-        background: rgba(0, 0, 0, 0.5);
-      }
-
-      40% {
-        background: rgba(0, 0, 0, 0.3);
-      }
-
-      100% {
-        background: rgba(0, 0, 0, 0);
-      }
+      0%   { background: rgba(0,0,0,0.5); }
+      40%  { background: rgba(0,0,0,0.3); }
+      100% { background: rgba(0,0,0,0); }
     }
 
     @keyframes bannerPop {
-      0% {
-        transform: scale(0.3) translateY(20px);
-        opacity: 0;
-      }
-
-      20% {
-        transform: scale(1.1) translateY(0);
-        opacity: 1;
-      }
-
-      35% {
-        transform: scale(0.95);
-      }
-
-      50% {
-        transform: scale(1.02);
-        opacity: 1;
-      }
-
-      80% {
-        opacity: 1;
-      }
-
-      100% {
-        transform: scale(1);
-        opacity: 0;
-      }
+      0%   { transform: scale(0.3) translateY(20px); opacity: 0; }
+      20%  { transform: scale(1.1) translateY(0); opacity: 1; }
+      35%  { transform: scale(0.95); }
+      50%  { transform: scale(1.02); opacity: 1; }
+      80%  { opacity: 1; }
+      100% { transform: scale(1); opacity: 0; }
     }
 
-    /* ===== BACKGROUND PARTICLES ===== */
     #particles-canvas {
       position: fixed;
       inset: 0;
@@ -1051,490 +558,77 @@
 
 <body>
 
-  <!-- =====================================================
-       3D INTRO OVERLAY
-       ===================================================== -->
-  <div id="intro-overlay">
-    <canvas id="intro-canvas"></canvas>
+  <canvas id="particles-canvas"></canvas>
 
-    <div id="intro-content">
-      <div id="intro-text">
-        <h1>Welcome to<br><span class="accent">AEE Annual<br>Conference</span></h1>
-        <p>Done by VINSMOKE</p>
-      </div>
-    </div>
+  <div class="corner-dec tl"></div>
+  <div class="corner-dec tr"></div>
+  <div class="corner-dec bl"></div>
+  <div class="corner-dec br"></div>
 
-    <div id="coord-display">32.042355°N &nbsp; 35.900693°E</div>
+  <div id="logo-wrap" title="Click &amp; drag to rotate">
+    <canvas id="logo-canvas" width="130" height="130" style="width:130px;height:130px;border-radius:10px;"></canvas>
+  </div>
 
-    <div id="marker-ping">
-      <div class="ping-ring"></div>
-      <div class="ping-ring"></div>
-      <div class="ping-center"></div>
-    </div>
+  <div id="x-overlay"><div id="x-symbol">✗</div></div>
+  <div id="check-overlay"><div id="check-symbol">✓</div></div>
+  <div id="buzzer-flash"></div>
 
-    <div id="intro-loader">
-      <div class="loader-dot"></div>
-      <div class="loader-dot"></div>
-      <div class="loader-dot"></div>
+  <div id="header">
+    <div contenteditable="true" id="game-title" spellcheck="false">Energy Awareness Competition</div>
+    <div id="stage-wrap">
+      <span class="stage-label">Stage</span>
+      <button class="stage-btn active" id="stage1-btn" onclick="setStage(1)">1</button>
+      <button class="stage-btn" id="stage2-btn" onclick="setStage(2)">2</button>
     </div>
   </div>
 
-  <!-- =====================================================
-       MAIN WEBSITE (hidden until intro finishes)
-       ===================================================== -->
-  <div id="main-website">
-    <canvas id="particles-canvas"></canvas>
+  <div id="main">
 
-    <div class="corner-dec tl"></div>
-    <div class="corner-dec tr"></div>
-    <div class="corner-dec bl"></div>
-    <div class="corner-dec br"></div>
-
-    <div id="logo-wrap" title="Click &amp; drag to rotate">
-      <canvas id="logo-canvas" width="130" height="130"
-        style="width:130px;height:130px;border-radius:10px;"></canvas>
+    <div class="team-panel left">
+      <input class="team-name-input" id="team-a-name" value="TEAM ALPHA" maxlength="16" spellcheck="false">
+      <div class="score-display" id="score-a">0</div>
+      <div class="buzzer-indicator" id="buzz-a"></div>
     </div>
 
-    <div id="x-overlay">
-      <div id="x-symbol">✗</div>
-    </div>
+    <div id="center-panel">
+      <div id="round-badge">Round <span id="round-num">0</span> &nbsp;·&nbsp; Stage <span id="round-stage">1</span></div>
 
-    <div id="check-overlay">
-      <div id="check-symbol">✓</div>
-    </div>
-
-    <div id="buzzer-flash"></div>
-
-    <div id="header">
-      <div contenteditable="true" id="game-title" spellcheck="false">Energy Awareness Competition</div>
-      <div id="stage-wrap">
-        <span class="stage-label">Stage</span>
-        <button class="stage-btn active" id="stage1-btn" onclick="setStage(1)">1</button>
-        <button class="stage-btn" id="stage2-btn" onclick="setStage(2)">2</button>
-      </div>
-    </div>
-
-    <div id="main">
-
-      <div class="team-panel left">
-        <input class="team-name-input" id="team-a-name" value="TEAM ALPHA" maxlength="16" spellcheck="false">
-        <div class="score-display" id="score-a">0</div>
-        <div class="buzzer-indicator" id="buzz-a"></div>
-      </div>
-
-      <div id="center-panel">
-        <div id="round-badge">Round <span id="round-num">0</span> &nbsp;·&nbsp; Stage <span
-            id="round-stage">1</span>
+      <div id="question-board">
+        <div id="question-waiting">
+          <div class="press-t">Press Space to cycle, 'T' to start</div>
+          <div class="key-badge">T</div>
         </div>
-
-        <div id="question-board">
-          <div id="question-waiting">
-          </div>
-          <div id="question-text"></div>
-          <div id="answer-reveal"></div>
+        <div id="question-text"></div>
+        
+        <div id="options-grid">
+          <div class="option-row" id="opt-1"><span class="opt-key">1</span> <span class="opt-text"></span></div>
+          <div class="option-row" id="opt-2"><span class="opt-key">2</span> <span class="opt-text"></span></div>
+          <div class="option-row" id="opt-3"><span class="opt-key">3</span> <span class="opt-text"></span></div>
+          <div class="option-row" id="opt-4"><span class="opt-key">4</span> <span class="opt-text"></span></div>
         </div>
-
-        <div id="timer-wrap">
-          <div id="timer-label">Time Remaining</div>
-          <div id="timer-display">10</div>
-          <div id="timer-bar-wrap">
-            <div id="timer-bar"></div>
-          </div>
-        </div>
-
-
       </div>
 
-      <div class="team-panel right">
-        <input class="team-name-input" id="team-b-name" value="TEAM BRAVO" maxlength="16" spellcheck="false">
-        <div class="score-display" id="score-b">0</div>
-        <div class="buzzer-indicator" id="buzz-b"></div>
+      <div id="timer-wrap">
+        <div id="timer-label">Time Remaining</div>
+        <div id="timer-display">20</div>
+        <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
       </div>
 
     </div>
 
-    <div id="buzz-banner">
-      <div id="buzz-banner-inner"></div>
+    <div class="team-panel right">
+      <input class="team-name-input" id="team-b-name" value="TEAM BRAVO" maxlength="16" spellcheck="false">
+      <div class="score-display" id="score-b">0</div>
+      <div class="buzzer-indicator" id="buzz-b"></div>
     </div>
+
   </div>
 
-  <!-- =====================================================
-       THREE.JS (shared by intro + logo)
-       ===================================================== -->
+  <div id="buzz-banner">
+    <div id="buzz-banner-inner"></div>
+  </div>
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-
-  <!-- =====================================================
-       3D INTRO SCRIPT
-       ===================================================== -->
-  <script>
-    (function () {
-      'use strict';
-
-      const canvas = document.getElementById('intro-canvas');
-      const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
-      renderer.setSize(window.innerWidth, window.innerHeight);
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-      renderer.setClearColor(0x030014);
-      renderer.toneMapping = THREE.ACESFilmicToneMapping;
-      renderer.toneMappingExposure = 1.2;
-
-      const scene = new THREE.Scene();
-      const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 2000);
-      camera.position.set(0, 0, 3.2);
-
-      // ---- STARFIELD ----
-      const starCount = 2500;
-      const starGeo = new THREE.BufferGeometry();
-      const starPos = new Float32Array(starCount * 3);
-      const starSizes = new Float32Array(starCount);
-      for (let i = 0; i < starCount; i++) {
-        const r = 50 + Math.random() * 450;
-        const theta = Math.random() * Math.PI * 2;
-        const phi = Math.acos(2 * Math.random() - 1);
-        starPos[i * 3] = r * Math.sin(phi) * Math.cos(theta);
-        starPos[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
-        starPos[i * 3 + 2] = r * Math.cos(phi);
-        starSizes[i] = Math.random() * 2 + 0.5;
-      }
-      starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
-      starGeo.setAttribute('size', new THREE.BufferAttribute(starSizes, 1));
-
-      const starMat = new THREE.PointsMaterial({
-        color: 0xffffff,
-        size: 1.5,
-        sizeAttenuation: true,
-        transparent: true,
-        opacity: 0.8,
-      });
-      const stars = new THREE.Points(starGeo, starMat);
-      scene.add(stars);
-
-      // ---- EARTH ----
-      const textureLoader = new THREE.TextureLoader();
-
-      // Earth sphere
-      const earthGeo = new THREE.SphereGeometry(1, 64, 64);
-      const earthMat = new THREE.MeshPhongMaterial({
-        color: 0x2255aa,
-        emissive: 0x112244,
-        shininess: 25,
-        transparent: false,
-      });
-      const earth = new THREE.Mesh(earthGeo, earthMat);
-      scene.add(earth);
-
-      // Load real earth texture
-      textureLoader.load(
-        'https://unpkg.com/three-globe@2.31.1/example/img/earth-blue-marble.jpg',
-        function (texture) {
-          earthMat.map = texture;
-          earthMat.color.set(0xffffff);
-          earthMat.emissive.set(0x111111);
-          earthMat.needsUpdate = true;
-        },
-        undefined,
-        function () {
-          // Fallback: use procedural color if texture fails
-          console.warn('Earth texture fallback');
-        }
-      );
-
-      // Also bump map for realism
-      textureLoader.load(
-        'https://unpkg.com/three-globe@2.31.1/example/img/earth-topology.png',
-        function (bumpTex) {
-          earthMat.bumpMap = bumpTex;
-          earthMat.bumpScale = 0.04;
-          earthMat.needsUpdate = true;
-        }
-      );
-
-      // ---- ATMOSPHERE GLOW ----
-      const atmosGeo = new THREE.SphereGeometry(1.05, 64, 64);
-      const atmosMat = new THREE.ShaderMaterial({
-        vertexShader: `
-          varying vec3 vNormal;
-          varying vec3 vPosition;
-          void main() {
-            vNormal = normalize(normalMatrix * normal);
-            vPosition = (modelViewMatrix * vec4(position, 1.0)).xyz;
-            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-          }
-        `,
-        fragmentShader: `
-          varying vec3 vNormal;
-          varying vec3 vPosition;
-          void main() {
-            float intensity = pow(0.72 - dot(vNormal, vec3(0.0, 0.0, 1.0)), 2.5);
-            vec3 color = vec3(0.14, 0.71, 0.61);
-            gl_FragColor = vec4(color, intensity * 0.65);
-          }
-        `,
-        blending: THREE.AdditiveBlending,
-        side: THREE.BackSide,
-        transparent: true,
-        depthWrite: false,
-      });
-      const atmosphere = new THREE.Mesh(atmosGeo, atmosMat);
-      scene.add(atmosphere);
-
-      // ---- OUTER GLOW (larger) ----
-      const outerGlowGeo = new THREE.SphereGeometry(1.18, 64, 64);
-      const outerGlowMat = new THREE.ShaderMaterial({
-        vertexShader: `
-          varying vec3 vNormal;
-          void main() {
-            vNormal = normalize(normalMatrix * normal);
-            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-          }
-        `,
-        fragmentShader: `
-          varying vec3 vNormal;
-          void main() {
-            float intensity = pow(0.5 - dot(vNormal, vec3(0.0, 0.0, 1.0)), 3.0);
-            vec3 color = vec3(0.08, 0.45, 0.55);
-            gl_FragColor = vec4(color, intensity * 0.3);
-          }
-        `,
-        blending: THREE.AdditiveBlending,
-        side: THREE.BackSide,
-        transparent: true,
-        depthWrite: false,
-      });
-      const outerGlow = new THREE.Mesh(outerGlowGeo, outerGlowMat);
-      scene.add(outerGlow);
-
-      // ---- LIGHTING ----
-      const ambientLight = new THREE.AmbientLight(0x334466, 0.6);
-      scene.add(ambientLight);
-
-      const sunLight = new THREE.DirectionalLight(0xfff5e0, 1.8);
-      sunLight.position.set(5, 3, 5);
-      scene.add(sunLight);
-
-      const rimLight = new THREE.DirectionalLight(0x4ae8cc, 0.4);
-      rimLight.position.set(-3, -1, -3);
-      scene.add(rimLight);
-
-      // ---- MARKER at (32.042355, 35.900693) ----
-      const TARGET_LAT = 32.042355;
-      const TARGET_LON = 35.900693;
-
-      function latLonToVec3(lat, lon, radius) {
-        const phi = (90 - lat) * (Math.PI / 180);
-        const theta = (lon + 180) * (Math.PI / 180);
-        return new THREE.Vector3(
-          -radius * Math.sin(phi) * Math.cos(theta),
-          radius * Math.cos(phi),
-          radius * Math.sin(phi) * Math.sin(theta)
-        );
-      }
-
-      const markerPos3D = latLonToVec3(TARGET_LAT, TARGET_LON, 1.02);
-
-      // Small glowing sphere marker on Earth
-      const markerGeo = new THREE.SphereGeometry(0.018, 16, 16);
-      const markerMat = new THREE.MeshBasicMaterial({
-        color: 0x4ae8cc,
-        transparent: true,
-        opacity: 0,
-      });
-      const marker3D = new THREE.Mesh(markerGeo, markerMat);
-      marker3D.position.copy(markerPos3D);
-      earth.add(marker3D);
-
-      // Marker ring
-      const ringGeo = new THREE.RingGeometry(0.025, 0.035, 32);
-      const ringMat = new THREE.MeshBasicMaterial({
-        color: 0x4ae8cc,
-        transparent: true,
-        opacity: 0,
-        side: THREE.DoubleSide
-      });
-      const markerRing = new THREE.Mesh(ringGeo, ringMat);
-      markerRing.position.copy(markerPos3D);
-      markerRing.lookAt(new THREE.Vector3(0, 0, 0));
-      earth.add(markerRing);
-
-      // ---- ANIMATION STATE ----
-      let phase = 'intro'; // 'intro' → 'zoom' → 'done'
-      let elapsed = 0;
-      const INTRO_DURATION = 3.0; // seconds before zoom starts
-      const ZOOM_DURATION = 3.0; // seconds for zoom animation
-      const clock = new THREE.Clock();
-
-      // Position Earth slightly to the right
-      earth.position.set(0.6, 0, 0);
-      atmosphere.position.copy(earth.position);
-      outerGlow.position.copy(earth.position);
-
-      // Camera start
-      const camStartPos = new THREE.Vector3(0, 0, 3.2);
-      const camStartLookAt = new THREE.Vector3(0.6, 0, 0);
-
-      // Compute the target Earth rotation that places Jordan facing the camera.
-      // The marker is at local position markerPos3D on the sphere.
-      // We need to rotate Earth on Y so that markerPos3D ends up pointing toward +Z (camera direction).
-      // The local marker theta angle (around Y) determines which Y rotation brings it front-facing.
-      const markerTheta = Math.atan2(markerPos3D.x, markerPos3D.z);
-      // Target rotation: rotate Earth so the marker's longitude faces the camera
-      // We want the marker's local Z to align with world +Z, so targetRotY = -markerTheta
-      const targetEarthRotY = -markerTheta;
-
-      // The camera zoom endpoint: look at the marker's position on the sphere surface (in world coords)
-      // After Earth rotates to targetEarthRotY, the marker world position will be:
-      function getMarkerWorldPosAtRotation(rotY) {
-        const cosR = Math.cos(rotY);
-        const sinR = Math.sin(rotY);
-        // Rotate markerPos3D around Y axis
-        const x = markerPos3D.x * cosR + markerPos3D.z * sinR;
-        const y = markerPos3D.y;
-        const z = -markerPos3D.x * sinR + markerPos3D.z * cosR;
-        // Add Earth's world offset
-        return new THREE.Vector3(x + earth.position.x, y + earth.position.y, z + earth.position.z);
-      }
-
-      // Pre-compute where the marker will be when Earth faces camera
-      const finalMarkerWorldPos = getMarkerWorldPosAtRotation(targetEarthRotY);
-      // Camera end position: slightly in front of the marker, pulled back along its normal
-      const markerNormal = finalMarkerWorldPos.clone().sub(earth.position).normalize();
-      const camEndPos = earth.position.clone().add(markerNormal.clone().multiplyScalar(1.65));
-      const camEndLookAt = finalMarkerWorldPos.clone();
-
-      // Smooth easing
-      function easeInOutCubic(t) {
-        return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-      }
-
-      function easeOutExpo(t) {
-        return t === 1 ? 1 : 1 - Math.pow(2, -10 * t);
-      }
-
-      // ---- RESIZE ----
-      function onResize() {
-        const w = window.innerWidth;
-        const h = window.innerHeight;
-        camera.aspect = w / h;
-        camera.updateProjectionMatrix();
-        renderer.setSize(w, h);
-      }
-      window.addEventListener('resize', onResize);
-
-      // ---- RENDER LOOP ----
-      let introFinished = false;
-      let zoomStartRotation = null;
-
-      function animate() {
-        if (introFinished) return;
-        requestAnimationFrame(animate);
-
-        const delta = clock.getDelta();
-        elapsed += delta;
-
-        // Rotate Earth during intro
-        if (phase === 'intro') {
-          earth.rotation.y += delta * 0.25;
-        }
-
-        // Star twinkle
-        stars.rotation.y += delta * 0.005;
-        stars.rotation.x += delta * 0.002;
-
-        if (phase === 'intro' && elapsed >= INTRO_DURATION) {
-          phase = 'zoom';
-          elapsed = 0;
-          zoomStartRotation = earth.rotation.y;
-
-          // Show coordinate display
-          document.getElementById('coord-display').classList.add('show');
-
-          // Show marker
-          markerMat.opacity = 1;
-          ringMat.opacity = 0.8;
-        }
-
-        if (phase === 'zoom') {
-          const t = Math.min(elapsed / ZOOM_DURATION, 1);
-          const eased = easeInOutCubic(t);
-
-          // 1) Rotate Earth so Jordan faces the camera
-          //    Lerp from the rotation at zoom start to the target rotation
-          //    Handle shortest path rotation
-          let rotDiff = targetEarthRotY - zoomStartRotation;
-          // Normalize to [-PI, PI] for shortest path
-          while (rotDiff > Math.PI) rotDiff -= Math.PI * 2;
-          while (rotDiff < -Math.PI) rotDiff += Math.PI * 2;
-          earth.rotation.y = zoomStartRotation + rotDiff * eased;
-
-          // 2) Move camera toward the marker
-          camera.position.lerpVectors(camStartPos, camEndPos, eased);
-
-          // 3) Camera look-at: smoothly transition to look at the marker
-          const lookTarget = new THREE.Vector3();
-          lookTarget.lerpVectors(camStartLookAt, camEndLookAt, eased);
-          camera.lookAt(lookTarget);
-
-          // Pulse marker ring
-          const ringScale = 1 + Math.sin(elapsed * 6) * 0.3;
-          markerRing.scale.set(ringScale, ringScale, 1);
-
-          // At the end of zoom
-          if (t >= 1) {
-            phase = 'done';
-            finishIntro();
-          }
-        }
-
-        // Sync atmosphere and outer glow with earth
-        atmosphere.position.copy(earth.position);
-        atmosphere.rotation.copy(earth.rotation);
-        outerGlow.position.copy(earth.position);
-
-        renderer.render(scene, camera);
-      }
-
-      animate();
-
-      // ---- FINISH INTRO ----
-      function finishIntro() {
-        introFinished = true;
-
-        // Wait a beat then transition
-        setTimeout(() => {
-          const overlay = document.getElementById('intro-overlay');
-          overlay.classList.add('fade-out');
-
-          // Show main website
-          const mainWebsite = document.getElementById('main-website');
-
-          setTimeout(() => {
-            mainWebsite.classList.add('revealed');
-            // Allow scrolling again
-            document.body.style.overflow = '';
-          }, 300);
-
-          setTimeout(() => {
-            overlay.classList.add('hidden');
-            // Clean up Three.js resources
-            renderer.dispose();
-          }, 1500);
-        }, 600);
-      }
-
-      // Skip intro on click
-      document.getElementById('intro-overlay').addEventListener('click', function () {
-        if (phase !== 'done') {
-          phase = 'done';
-          finishIntro();
-        }
-      });
-
-    })();
-  </script>
-
-  <!-- =====================================================
-       LOGO 3D (existing)
-       ===================================================== -->
   <script>
     (function () {
       const canvas = document.getElementById('logo-canvas');
@@ -1551,12 +645,8 @@
       const root = new THREE.Group();
       scene.add(root);
 
-      // --- SOLID COLOR MATERIAL — exact match to title color, no lighting needed ---
-      const brandMaterial = new THREE.MeshBasicMaterial({
-        color: 0x1a8a76     // Exact title color (--primary-dark), no light interaction
-      });
+      const brandMaterial = new THREE.MeshBasicMaterial({ color: 0x1a8a76 });
 
-      // Mouse-rotate state
       let isRotating = false;
       let rotStart = { x: 0, y: 0 };
       let rotCurrent = { x: 0, y: 0.3 };
@@ -1573,20 +663,15 @@
       });
       document.addEventListener('mouseup', () => { isRotating = false; });
 
-      // Load GLB
       const loaderScript = document.createElement('script');
       loaderScript.src = 'https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js';
       loaderScript.onload = function () {
         const loader = new THREE.GLTFLoader();
         loader.load('logo.glb', function (gltf) {
           const model = gltf.scene;
-
           model.traverse(function (obj) {
-            if (obj.isMesh) {
-              obj.material = brandMaterial;
-            }
+            if (obj.isMesh) obj.material = brandMaterial;
           });
-
           const box = new THREE.Box3().setFromObject(model);
           const center = box.getCenter(new THREE.Vector3());
           const size = box.getSize(new THREE.Vector3());
@@ -1594,16 +679,11 @@
           model.position.sub(center);
           model.scale.setScalar(4.2 / maxDim);
           root.add(model);
-
           const fov = camera.fov * (Math.PI / 180);
           camera.position.z = (4.2 / (2 * Math.tan(fov / 2))) * 1.15;
           camera.updateProjectionMatrix();
         }, undefined, function (err) {
-          console.warn('GLB load error:', err);
-          const fallback = new THREE.Mesh(
-            new THREE.CylinderGeometry(1, 1, 0.4, 6),
-            brandMaterial
-          );
+          const fallback = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, 0.4, 6), brandMaterial);
           root.add(fallback);
         });
       };
@@ -1618,75 +698,49 @@
     })();
   </script>
 
-  <!-- =====================================================
-       GAME LOGIC (existing)
-       ===================================================== -->
   <script>
     // ============================================================
     //  STATE
     // ============================================================
-    let questionsR1 = [];
-    let questionsR2 = [];
+    let questionsR1 = [];   
+    let questionsR2 = [];   
     let allQuestions = [];
     let currentQuestion = null;
     let usedIndices = new Set();
-    let roundNum = 0;
+    let roundNum = 0;         
     let scoreA = 0, scoreB = 0;
     let currentStage = 1;
     let questionVisible = false;
-    let answerVisible = false;
+    let answerLocked = false; // Prevents answering multiple times per question
     let timerInterval = null;
-    let timerSeconds = 10;
-    const TIMER_TOTAL = 10;
+    let timerSeconds = 20;
 
     // ============================================================
-    //  PARSE TEXT FILE FORMAT
-    // ============================================================
-    function parseTextFile(text) {
-      const questions = [];
-      const lines = text.split('\n');
-      let currentQ = null;
-      for (let raw of lines) {
-        const line = raw.trim();
-        if (line.toUpperCase().startsWith('Q:')) {
-          currentQ = { question: line.slice(2).trim(), answer: '' };
-        } else if (line.toUpperCase().startsWith('A:') && currentQ) {
-          currentQ.answer = line.slice(2).trim();
-          questions.push(currentQ);
-          currentQ = null;
-        }
-      }
-      return questions;
-    }
-
-    // ============================================================
-    //  LOAD QUESTIONS FROM TEXT FILES
+    //  LOAD JSON DATA INSTEAD OF TXT
     // ============================================================
     async function loadQuestions() {
+      // Fallback data in case the JSON fails to load
       const fallback = [
-        { question: "Name something you find in a kitchen", answer: "Refrigerator" },
-        { question: "Name a popular sport", answer: "Soccer / Football" },
-        { question: "Name something people do on weekends", answer: "Sleep in" },
-        { question: "Name a reason people are late to work", answer: "Traffic" },
-        { question: "Name something you take on vacation", answer: "Clothes / Luggage" },
+        {
+          question: "Name something you find in a kitchen",
+          options: ["Refrigerator", "Bed", "Car", "Tree"],
+          correctAnswer: 1
+        }
       ];
 
       try {
-        const r1 = await fetch('round1.txt');
-        if (r1.ok) questionsR1 = parseTextFile(await r1.text());
-      } catch (e) { }
-
-      try {
-        const r2 = await fetch('round2.txt');
-        if (r2.ok) questionsR2 = parseTextFile(await r2.text());
-      } catch (e) { }
-
-      if (questionsR1.length === 0 && questionsR2.length === 0) {
-        questionsR1 = fallback;
-        questionsR2 = fallback;
+        // MAKE SURE your file is named "round1_MCQ_formatted.json" in the same folder!
+        const r1 = await fetch('round1_MCQ_formatted.json');
+        if (r1.ok) {
+           questionsR1 = await r1.json();
+        }
+      } catch (e) {
+         console.warn('Failed to load JSON, using fallback data.');
       }
-      if (questionsR1.length === 0) questionsR1 = questionsR2;
-      if (questionsR2.length === 0) questionsR2 = questionsR1;
+
+      // If needed, do the same for round2.json in the future
+      if (questionsR1.length === 0) questionsR1 = fallback;
+      questionsR2 = questionsR1; // Mirroring for now
 
       allQuestions = questionsR1;
       pickNextQuestion();
@@ -1703,27 +757,32 @@
       usedIndices.add(idx);
       currentQuestion = allQuestions[idx];
       questionVisible = false;
-      answerVisible = false;
+      answerLocked = false;
     }
 
     function nextQuestion() {
       stopTimer();
+      buzzerLocked = false;
       pickNextQuestion();
+      
       document.getElementById('question-waiting').style.display = 'flex';
       document.getElementById('question-text').style.display = 'none';
-      document.getElementById('answer-reveal').style.display = 'none';
+      document.getElementById('options-grid').style.display = 'none';
       document.getElementById('timer-wrap').style.display = 'none';
+      
       const disp = document.getElementById('timer-display');
       const bar = document.getElementById('timer-bar');
       disp.classList.remove('urgent');
       bar.classList.remove('urgent');
       bar.style.width = '100%';
-      disp.textContent = TIMER_TOTAL;
+      disp.textContent = "20";
+
+      // Reset choice styling
+      for(let i=1; i<=4; i++) {
+         document.getElementById('opt-'+i).className = 'option-row';
+      }
     }
 
-    // ============================================================
-    //  STAGE
-    // ============================================================
     function setStage(n) {
       currentStage = n;
       document.getElementById('stage1-btn').classList.toggle('active', n === 1);
@@ -1738,45 +797,61 @@
     }
 
     // ============================================================
-    //  T → SHOW QUESTION + START TIMER + INCREMENT ROUND
+    //  T → SHOW QUESTION & OPTIONS + START 20S TIMER
     // ============================================================
     function showQuestion() {
       if (!currentQuestion || questionVisible) return;
       questionVisible = true;
-
       roundNum++;
       document.getElementById('round-num').textContent = roundNum;
 
       document.getElementById('question-waiting').style.display = 'none';
-      document.getElementById('answer-reveal').style.display = 'none';
-      answerVisible = false;
+      
       const qt = document.getElementById('question-text');
       qt.textContent = currentQuestion.question;
       qt.style.display = 'block';
       qt.style.opacity = 0;
+
+      // Populate options
+      if (currentQuestion.options && currentQuestion.options.length === 4) {
+         const grid = document.getElementById('options-grid');
+         grid.style.display = 'grid';
+         for(let i=1; i<=4; i++){
+            document.getElementById('opt-' + i).querySelector('.opt-text').textContent = currentQuestion.options[i-1];
+         }
+      }
+
       requestAnimationFrame(() => { qt.style.opacity = 1; });
-      startTimer();
+      startTimer(20); // Question time is 20s
     }
 
     // ============================================================
-    //  Y → REVEAL ANSWER
+    //  CHECK ANSWER LOGIC
     // ============================================================
-    function showAnswer() {
-      if (!questionVisible || answerVisible) return;
-      answerVisible = true;
+    function checkAnswer(choiceNum) {
+      if (answerLocked || !currentQuestion || !questionVisible) return;
+      answerLocked = true;
       stopTimer();
-      const ar = document.getElementById('answer-reveal');
-      const ans = currentQuestion.answer || '—';
-      ar.textContent = '✔ ' + ans;
-      ar.style.display = 'block';
-      playRevealSound();
+
+      const correctNum = currentQuestion.correctAnswer;
+      
+      if (choiceNum === correctNum) {
+         // Correct
+         document.getElementById('opt-' + choiceNum).classList.add('correct');
+         showCorrect();
+      } else {
+         // Wrong
+         document.getElementById('opt-' + choiceNum).classList.add('wrong');
+         document.getElementById('opt-' + correctNum).classList.add('correct'); // Reveal the right one
+         showWrongX();
+      }
     }
 
     // ============================================================
     //  TIMER
     // ============================================================
     function startTimer(duration) {
-      const total = duration || TIMER_TOTAL;
+      const total = duration;
       timerSeconds = total;
       const wrap = document.getElementById('timer-wrap');
       const disp = document.getElementById('timer-display');
@@ -1829,7 +904,6 @@
       if (delta > 0) playScoreUpSound();
       else playScoreDownSound();
     }
-
     function bumpAnim(el) {
       el.classList.add('bump');
       setTimeout(() => el.classList.remove('bump'), 200);
@@ -1839,28 +913,33 @@
     //  KEYBOARD
     // ============================================================
     document.addEventListener('keydown', (e) => {
-      // Don't process keys during intro
-      if (document.getElementById('intro-overlay') && !document.getElementById('intro-overlay').classList.contains('hidden')) return;
-
       if (e.target.tagName === 'INPUT' && e.target.classList.contains('team-name-input')) return;
       if (e.target.contentEditable === 'true' && e.key.length === 1 && !e.ctrlKey && !e.metaKey) return;
-      switch (e.key.toLowerCase()) {
+      
+      const key = e.key.toLowerCase();
+
+      // Check for MCQ answers 1, 2, 3, 4
+      if (['1', '2', '3', '4'].includes(key) && questionVisible) {
+         checkAnswer(parseInt(key));
+         return;
+      }
+
+      switch (key) {
         case 't': e.preventDefault(); showQuestion(); break;
-        case 'y': showAnswer(); break;
-        case 'v': showCorrect(); break;
         case 'q': updateScore('a', -1); break;
         case 'w': updateScore('a', +1); break;
         case 'o': updateScore('b', -1); break;
         case 'p': updateScore('b', +1); break;
         case 'x': showWrongX(); break;
         case ' ': e.preventDefault(); nextQuestion(); break;
+        // Buzzers
         case 'a': e.preventDefault(); handleBuzz('a'); break;
         case 'b': e.preventDefault(); handleBuzz('b'); break;
       }
     });
 
     // ============================================================
-    //  WRONG X
+    //  WRONG X & CORRECT CHECK OVERLAYS
     // ============================================================
     let xTimeout;
     function showWrongX() {
@@ -1873,9 +952,6 @@
       xTimeout = setTimeout(() => overlay.classList.remove('show'), 1400);
     }
 
-    // ============================================================
-    //  CORRECT CHECK  (V key)
-    // ============================================================
     let checkTimeout;
     function showCorrect() {
       playCorrectSound();
@@ -1928,8 +1004,7 @@
       [[523, 0], [659, 0.12], [784, 0.24]].forEach(([freq, t]) => {
         const osc = ctx.createOscillator(); const g = ctx.createGain();
         osc.connect(g); g.connect(master);
-        osc.type = 'sine';
-        osc.frequency.value = freq;
+        osc.type = 'sine'; osc.frequency.value = freq;
         g.gain.setValueAtTime(0, ctx.currentTime + t);
         g.gain.linearRampToValueAtTime(0.6, ctx.currentTime + t + 0.02);
         g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + t + 0.45);
@@ -1944,18 +1019,6 @@
       });
     }
 
-    function playRevealSound() {
-      const ctx = getCtx();
-      [0, 0.09, 0.18].forEach((t, i) => {
-        const osc = ctx.createOscillator(); const g = ctx.createGain();
-        osc.connect(g); g.connect(ctx.destination);
-        osc.type = 'triangle'; osc.frequency.value = 660 + i * 220;
-        g.gain.setValueAtTime(0.35, ctx.currentTime + t);
-        g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + t + 0.22);
-        osc.start(ctx.currentTime + t); osc.stop(ctx.currentTime + t + 0.25);
-      });
-    }
-
     function playScoreUpSound() {
       const ctx = getCtx();
       [[523, 0], [659, 0.13]].forEach(([freq, t]) => {
@@ -1964,11 +1027,6 @@
         g.gain.setValueAtTime(0, ctx.currentTime + t); g.gain.linearRampToValueAtTime(0.5, ctx.currentTime + t + 0.015);
         g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + t + 0.32);
         osc.start(ctx.currentTime + t); osc.stop(ctx.currentTime + t + 0.35);
-        const osc2 = ctx.createOscillator(); const g2 = ctx.createGain();
-        osc2.connect(g2); g2.connect(ctx.destination); osc2.type = 'triangle'; osc2.frequency.value = freq * 2;
-        g2.gain.setValueAtTime(0, ctx.currentTime + t); g2.gain.linearRampToValueAtTime(0.15, ctx.currentTime + t + 0.015);
-        g2.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + t + 0.25);
-        osc2.start(ctx.currentTime + t); osc2.stop(ctx.currentTime + t + 0.28);
       });
     }
 
@@ -2013,22 +1071,21 @@
     }
 
     // ============================================================
-    //  ESP32 BLE KEYBOARD BUZZER SYSTEM
+    //  BUZZER LOGIC (A / B keys)
     // ============================================================
     let buzzerLocked = false;
     let bannerTimeout;
 
     function handleBuzz(team) {
-      if (buzzerLocked) return;
+      if (buzzerLocked) return; 
       buzzerLocked = true;
 
       stopTimer();
-      startTimer(5);
+      startTimer(7); // Buzzer time is 7 seconds
 
       flashBuzzer('team-' + team);
       animateBuzzIndicator('buzz-' + team);
       playBuzzerSound();
-
       showBuzzBanner(team);
     }
 
@@ -2048,24 +1105,6 @@
       bannerTimeout = setTimeout(() => banner.classList.remove('show'), 2800);
     }
 
-    // Reset lockout on next question
-    const _origNextQuestion = nextQuestion;
-    nextQuestion = function () {
-      buzzerLocked = false;
-      _origNextQuestion();
-    };
-
-    function flashBuzzer(cls) {
-      const f = document.getElementById('buzzer-flash');
-      f.className = cls; f.style.opacity = 1;
-      setTimeout(() => { f.style.opacity = 0; f.className = ''; }, 500);
-    }
-    function animateBuzzIndicator(id) {
-      const el = document.getElementById(id);
-      el.classList.add('active');
-      setTimeout(() => el.classList.remove('active'), 2500);
-    }
-
     // ============================================================
     //  INIT
     // ============================================================
@@ -2076,13 +1115,9 @@
     });
   </script>
 
-  <!-- =====================================================
-       FLOATING PARTICLES (existing)
-       ===================================================== -->
   <script>
     (function () {
       const cvs = document.getElementById('particles-canvas');
-      if (!cvs) return;
       const ctx2d = cvs.getContext('2d');
       let W, H;
       const PARTICLE_COUNT = 80;
@@ -2112,15 +1147,12 @@
         const t = performance.now() * 0.001;
 
         for (const p of particles) {
-          p.x += p.vx;
-          p.y += p.vy;
-
+          p.x += p.vx; p.y += p.vy;
           if (p.y < -5) { p.y = H + 5; p.x = Math.random() * W; }
           if (p.x < -5) p.x = W + 5;
           if (p.x > W + 5) p.x = -5;
 
           const glow = p.alpha + Math.sin(t * 0.8 + p.pulse) * 0.1;
-
           ctx2d.shadowColor = 'rgba(36, 181, 156, 0.4)';
           ctx2d.shadowBlur = p.r * 3;
 
@@ -2129,16 +1161,13 @@
           ctx2d.fillStyle = `rgba(36, 181, 156, ${glow})`;
           ctx2d.fill();
         }
-
         ctx2d.shadowColor = 'transparent';
         ctx2d.shadowBlur = 0;
-
         requestAnimationFrame(draw);
       }
       draw();
     })();
   </script>
-
 </body>
 
 </html>
