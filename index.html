@@ -1125,6 +1125,157 @@
       z-index: 0;
       pointer-events: none;
     }
+
+    /* ===== PASS USED CHECKBOX ===== */
+    .pass-row {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      margin-top: 6px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .pass-row input[type="checkbox"] {
+      accent-color: var(--primary);
+      width: 15px;
+      height: 15px;
+      cursor: pointer;
+    }
+    .pass-label {
+      font-size: 0.6rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    /* ===== ACTIVE TEAM GLOW (Stage 2 rebound) ===== */
+    .team-panel.active-turn {
+      box-shadow: 0 0 0 3px var(--primary), var(--shadow);
+      transition: box-shadow 0.3s;
+    }
+    .team-panel.left.active-turn {
+      box-shadow: 0 0 0 3px #2563eb, 0 0 24px rgba(37,99,235,0.35);
+    }
+    .team-panel.right.active-turn {
+      box-shadow: 0 0 0 3px var(--secondary), 0 0 24px rgba(248,209,62,0.35);
+    }
+
+    /* ===== WINNER OVERLAY ===== */
+    #winner-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 99990;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,0,0,0.82);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+    #winner-overlay.show {
+      display: flex;
+      animation: winnerBgIn 0.6s ease forwards;
+    }
+    @keyframes winnerBgIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+    #winner-card {
+      text-align: center;
+      padding: 48px 72px;
+      border-radius: 24px;
+      background: linear-gradient(145deg, rgba(36,181,156,0.15) 0%, rgba(0,0,0,0.6) 100%);
+      border: 2px solid rgba(36,181,156,0.3);
+      box-shadow: 0 0 80px rgba(36,181,156,0.2), 0 16px 48px rgba(0,0,0,0.5);
+      animation: winnerCardPop 0.8s cubic-bezier(0.16,1,0.3,1) forwards;
+    }
+    @keyframes winnerCardPop {
+      0%   { transform: scale(0.5) translateY(40px); opacity: 0; }
+      100% { transform: scale(1) translateY(0); opacity: 1; }
+    }
+    #winner-card .trophy {
+      font-size: 5rem;
+      line-height: 1;
+      margin-bottom: 12px;
+      animation: trophyBounce 1.2s ease infinite alternate;
+    }
+    @keyframes trophyBounce {
+      0%   { transform: translateY(0) scale(1); }
+      100% { transform: translateY(-8px) scale(1.05); }
+    }
+    #winner-card .winner-label {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(1.2rem, 3vw, 2rem);
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.5);
+      margin-bottom: 8px;
+    }
+    #winner-card .winner-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(3rem, 7vw, 6rem);
+      letter-spacing: 0.08em;
+      line-height: 1;
+      margin-bottom: 16px;
+    }
+    #winner-card .winner-name.team-a-color {
+      color: #5b9cf5;
+      text-shadow: 0 0 40px rgba(37,99,235,0.6);
+    }
+    #winner-card .winner-name.team-b-color {
+      color: #f8d13e;
+      text-shadow: 0 0 40px rgba(248,209,62,0.6);
+    }
+    #winner-card .winner-name.tie-color {
+      background: linear-gradient(90deg, #5b9cf5, #f8d13e);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    #winner-card .winner-score {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2rem, 4vw, 3.5rem);
+      color: rgba(255,255,255,0.7);
+      letter-spacing: 0.05em;
+    }
+    #winner-card .winner-close {
+      margin-top: 24px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 32px;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.1rem;
+      letter-spacing: 0.12em;
+      cursor: pointer;
+      transition: transform 0.15s;
+    }
+    #winner-card .winner-close:hover {
+      transform: translateY(-2px);
+    }
+
+    /* ===== RESET TOURNAMENT BUTTON (bottom-left) ===== */
+    #reset-btn {
+      position: fixed;
+      bottom: 10px;
+      left: 12px;
+      font-size: 0.55rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 3px 10px;
+      cursor: pointer;
+      z-index: 100;
+      opacity: 0.5;
+      transition: opacity 0.2s;
+    }
+    #reset-btn:hover {
+      opacity: 1;
+    }
   </style>
 </head>
 
@@ -1199,6 +1350,7 @@
         <input class="team-name-input" id="team-a-name" value="TEAM ALPHA" maxlength="16" spellcheck="false">
         <div class="score-display" id="score-a">0</div>
         <div class="buzzer-indicator" id="buzz-a"></div>
+        <label class="pass-row"><input type="checkbox" id="pass-a"><span class="pass-label">Pass Used</span></label>
       </div>
 
       <div id="center-panel">
@@ -1235,6 +1387,7 @@
         <input class="team-name-input" id="team-b-name" value="TEAM BRAVO" maxlength="16" spellcheck="false">
         <div class="score-display" id="score-b">0</div>
         <div class="buzzer-indicator" id="buzz-b"></div>
+        <label class="pass-row"><input type="checkbox" id="pass-b"><span class="pass-label">Pass Used</span></label>
       </div>
 
     </div>
@@ -1242,6 +1395,19 @@
     <div id="buzz-banner">
       <div id="buzz-banner-inner"></div>
     </div>
+
+    <!-- Winner Overlay -->
+    <div id="winner-overlay">
+      <div id="winner-card">
+        <div class="trophy">🏆</div>
+        <div class="winner-label">Winner</div>
+        <div class="winner-name" id="winner-name-text"></div>
+        <div class="winner-score" id="winner-score-text"></div>
+        <button class="winner-close" onclick="closeWinnerOverlay()">CLOSE</button>
+      </div>
+    </div>
+
+    <button id="reset-btn" onclick="resetTournament()" title="Clear all asked questions from localStorage">⟲ Reset Pool</button>
   </div>
 
   <!-- ==============================================
@@ -1660,7 +1826,7 @@
   </script>
 
   <!-- ==============================================
-       GAME LOGIC (FULLY UPDATED)
+       GAME LOGIC (FULLY REFACTORED)
        ============================================== -->
   <script>
     // ================================================================
@@ -1670,30 +1836,55 @@
     let questionsR2 = [];
     let allQuestions = [];
     let currentQuestion = null;
-    let usedIndicesR1 = new Set();
-    let usedIndicesR2 = new Set();
     let roundNum = 0;
     let scoreA = 0, scoreB = 0;
     let currentStage = 1;
     let questionVisible = false;
     let answerVisible = false;
-    let answerLocked = false; // prevents multiple MC answers
+    let answerLocked = false;
     let timerInterval = null;
     let timerSeconds = 20;
     const QUESTION_TIMER = 20;
     const BUZZER_TIMER = 7;
 
+    // --- Stage 2 rebound state ---
+    let activeBuzzTeam = null;  // 'a' or 'b' — who currently has the buzzer turn
+
+    // ================================================================
+    //  PERSISTENT QUESTION TRACKING (localStorage)
+    // ================================================================
+    const LS_KEY = 'askedQuestions';
+
+    function getAskedQuestions() {
+      try {
+        const raw = localStorage.getItem(LS_KEY);
+        return raw ? JSON.parse(raw) : [];
+      } catch (e) { return []; }
+    }
+
+    function saveAskedQuestion(questionText) {
+      const arr = getAskedQuestions();
+      arr.push(questionText);
+      localStorage.setItem(LS_KEY, JSON.stringify(arr));
+    }
+
+    function isQuestionAsked(questionText) {
+      return getAskedQuestions().includes(questionText);
+    }
+
+    /** Clear localStorage pool and reset in-memory state. Callable from console or UI. */
+    function resetTournament() {
+      localStorage.removeItem(LS_KEY);
+      roundNum = 0;
+      document.getElementById('round-num').textContent = roundNum;
+      console.log('[AEE] Tournament question pool reset.');
+    }
+
     // ================================================================
     //  PARSE TEXT FILE FORMATS
     // ================================================================
 
-    // --- Stage 1: Multiple Choice format ---
-    // Q: [text]
-    // 1: [opt1]
-    // 2: [opt2]
-    // 3: [opt3]
-    // 4: [opt4]
-    // A: [1-4]
+    // Stage 1: Multiple Choice — Q: / 1: / 2: / 3: / 4: / A:
     function parseMCFile(text) {
       const questions = [];
       const lines = text.split('\n');
@@ -1719,9 +1910,7 @@
       return questions;
     }
 
-    // --- Stage 2: Classic Q/A format ---
-    // Q: [text]
-    // A: [text answer]
+    // Stage 2: Classic Q/A — Q: / A:
     function parseQAFile(text) {
       const questions = [];
       const lines = text.split('\n');
@@ -1769,21 +1958,29 @@
       pickNextQuestion();
     }
 
-    function getUsedIndices() {
-      return currentStage === 1 ? usedIndicesR1 : usedIndicesR2;
-    }
-
+    // ================================================================
+    //  QUESTION SELECTION (localStorage-backed dedup)
+    // ================================================================
     function pickNextQuestion() {
-      const usedSet = getUsedIndices();
-      if (usedSet.size >= allQuestions.length) {
-        usedSet.clear();
+      const pool = allQuestions;
+      const asked = getAskedQuestions();
+
+      // Build list of un-asked indices
+      let available = [];
+      for (let i = 0; i < pool.length; i++) {
+        if (!asked.includes(pool[i].question)) {
+          available.push(i);
+        }
       }
-      let idx;
-      const max = allQuestions.length;
-      do { idx = Math.floor(Math.random() * max); }
-      while (usedSet.has(idx) && usedSet.size < max);
-      usedSet.add(idx);
-      currentQuestion = allQuestions[idx];
+
+      // If all exhausted, the pool is empty — still pick randomly (full cycle done)
+      if (available.length === 0) {
+        available = pool.map((_, i) => i);
+        console.log('[AEE] All questions in this stage have been asked. Cycling from full pool.');
+      }
+
+      const idx = available[Math.floor(Math.random() * available.length)];
+      currentQuestion = pool[idx];
       questionVisible = false;
       answerVisible = false;
       answerLocked = false;
@@ -1791,6 +1988,8 @@
 
     function nextQuestion() {
       stopTimer();
+      clearActiveTurnGlow();
+      activeBuzzTeam = null;
       pickNextQuestion();
       document.getElementById('question-waiting').style.display = 'flex';
       document.getElementById('question-text').style.display = 'none';
@@ -1803,8 +2002,7 @@
       bar.classList.remove('urgent');
       bar.style.width = '100%';
       disp.textContent = QUESTION_TIMER;
-
-      // Reset option button states
+      document.getElementById('timer-label').textContent = 'Time Remaining';
       resetOptionButtons();
     }
 
@@ -1838,6 +2036,9 @@
       questionVisible = true;
       answerLocked = false;
 
+      // Persist this question to localStorage immediately
+      saveAskedQuestion(currentQuestion.question);
+
       roundNum++;
       document.getElementById('round-num').textContent = roundNum;
 
@@ -1863,6 +2064,7 @@
         document.getElementById('options-grid').classList.remove('show');
       }
 
+      document.getElementById('timer-label').textContent = 'Time Remaining';
       startTimer(QUESTION_TIMER);
     }
 
@@ -1879,22 +2081,18 @@
       const correctNum = currentQuestion.correctIndex;
       const isCorrect = chosenNum === correctNum;
 
-      // Highlight correct answer
       document.getElementById('opt-' + correctNum).classList.add('correct');
 
-      // Highlight wrong if different
       if (!isCorrect) {
         document.getElementById('opt-' + chosenNum).classList.add('wrong');
       }
 
-      // Dim the other options
       for (let i = 1; i <= 4; i++) {
         if (i !== correctNum && i !== chosenNum) {
           document.getElementById('opt-' + i).classList.add('dimmed');
         }
       }
 
-      // Trigger overlay + sound
       if (isCorrect) {
         showCorrect();
       } else {
@@ -1903,18 +2101,109 @@
     }
 
     // ================================================================
+    //  G → PASS / RESTART 20s TIMER (Stage 1)
+    // ================================================================
+    function handlePass() {
+      if (!questionVisible) return;
+      stopTimer();
+      document.getElementById('timer-label').textContent = 'Time Remaining (Pass)';
+      startTimer(QUESTION_TIMER);
+    }
+
+    // ================================================================
     //  Y → REVEAL ANSWER (Stage 2 only)
     // ================================================================
     function showAnswer() {
       if (!questionVisible || answerVisible) return;
-      if (currentStage !== 2) return; // Only Stage 2
+      if (currentStage !== 2) return;
       answerVisible = true;
       stopTimer();
+      clearActiveTurnGlow();
       const ar = document.getElementById('answer-reveal');
       const ans = currentQuestion.answer || '—';
       ar.textContent = '✔ ' + ans;
       ar.style.display = 'block';
       playRevealSound();
+    }
+
+    // ================================================================
+    //  H → REBOUND (Stage 2): stop 7s, toggle team, start fresh 7s
+    // ================================================================
+    function handleRebound() {
+      if (!questionVisible || currentStage !== 2) return;
+      if (!activeBuzzTeam) return; // must have an active buzzer first
+
+      stopTimer();
+
+      // Toggle active team
+      const opponent = activeBuzzTeam === 'a' ? 'b' : 'a';
+      activeBuzzTeam = opponent;
+
+      // Update glow
+      clearActiveTurnGlow();
+      setActiveTurnGlow(opponent);
+
+      // Visual feedback
+      flashBuzzer('team-' + opponent);
+      animateBuzzIndicator('buzz-' + opponent);
+
+      // Label update
+      const nameEl = document.getElementById(opponent === 'a' ? 'team-a-name' : 'team-b-name');
+      document.getElementById('timer-label').textContent = (nameEl.value || (opponent === 'a' ? 'TEAM ALPHA' : 'TEAM BRAVO')) + ' — Rebound';
+
+      startTimer(BUZZER_TIMER);
+    }
+
+    // ================================================================
+    //  ACTIVE TEAM GLOW HELPERS
+    // ================================================================
+    function setActiveTurnGlow(team) {
+      const panels = document.querySelectorAll('.team-panel');
+      panels.forEach(p => p.classList.remove('active-turn'));
+      if (team === 'a') {
+        document.querySelector('.team-panel.left').classList.add('active-turn');
+      } else if (team === 'b') {
+        document.querySelector('.team-panel.right').classList.add('active-turn');
+      }
+    }
+    function clearActiveTurnGlow() {
+      document.querySelectorAll('.team-panel').forEach(p => p.classList.remove('active-turn'));
+    }
+
+    // ================================================================
+    //  M → WINNER DECLARATION
+    // ================================================================
+    function showWinner() {
+      const nameA = document.getElementById('team-a-name').value || 'TEAM ALPHA';
+      const nameB = document.getElementById('team-b-name').value || 'TEAM BRAVO';
+      const overlay = document.getElementById('winner-overlay');
+      const nameEl = document.getElementById('winner-name-text');
+      const scoreEl = document.getElementById('winner-score-text');
+
+      nameEl.classList.remove('team-a-color', 'team-b-color', 'tie-color');
+
+      if (scoreA > scoreB) {
+        nameEl.textContent = nameA;
+        nameEl.classList.add('team-a-color');
+        scoreEl.textContent = scoreA + ' — ' + scoreB;
+      } else if (scoreB > scoreA) {
+        nameEl.textContent = nameB;
+        nameEl.classList.add('team-b-color');
+        scoreEl.textContent = scoreA + ' — ' + scoreB;
+      } else {
+        nameEl.textContent = "IT'S A TIE!";
+        nameEl.classList.add('tie-color');
+        scoreEl.textContent = scoreA + ' — ' + scoreB;
+      }
+
+      overlay.classList.remove('show');
+      void overlay.offsetWidth;
+      overlay.classList.add('show');
+      playCorrectSound();
+    }
+
+    function closeWinnerOverlay() {
+      document.getElementById('winner-overlay').classList.remove('show');
     }
 
     // ================================================================
@@ -1986,13 +2275,19 @@
     document.addEventListener('keydown', (e) => {
       // Don't process keys during intro
       if (document.getElementById('intro-overlay') && !document.getElementById('intro-overlay').classList.contains('hidden')) return;
+      // Close winner overlay on Escape
+      if (e.key === 'Escape') { closeWinnerOverlay(); return; }
 
       if (e.target.tagName === 'INPUT' && e.target.classList.contains('team-name-input')) return;
       if (e.target.contentEditable === 'true' && e.key.length === 1 && !e.ctrlKey && !e.metaKey) return;
+
       switch (e.key.toLowerCase()) {
         case 't': e.preventDefault(); showQuestion(); break;
         case 'y': showAnswer(); break;
         case 'v': showCorrect(); break;
+        case 'g': e.preventDefault(); handlePass(); break;
+        case 'h': e.preventDefault(); handleRebound(); break;
+        case 'm': e.preventDefault(); showWinner(); break;
         case 'q': updateScore('a', -1); break;
         case 'w': updateScore('a', +1); break;
         case 'o': updateScore('b', -1); break;
@@ -2163,7 +2458,7 @@
     }
 
     // ================================================================
-    //  ESP32 BLE KEYBOARD BUZZER SYSTEM
+    //  BUZZER SYSTEM
     // ================================================================
     let buzzerLocked = false;
     let bannerTimeout;
@@ -2171,9 +2466,16 @@
     function handleBuzz(team) {
       if (buzzerLocked) return;
       buzzerLocked = true;
+      activeBuzzTeam = team;
 
       stopTimer();
+
+      // Show timer label with team name
+      const nameEl = document.getElementById(team === 'a' ? 'team-a-name' : 'team-b-name');
+      document.getElementById('timer-label').textContent = (nameEl.value || (team === 'a' ? 'TEAM ALPHA' : 'TEAM BRAVO')) + ' — Answer';
+
       startTimer(BUZZER_TIMER);
+      setActiveTurnGlow(team);
 
       flashBuzzer('team-' + team);
       animateBuzzIndicator('buzz-' + team);
@@ -2202,6 +2504,8 @@
     const _origNextQuestion = nextQuestion;
     nextQuestion = function () {
       buzzerLocked = false;
+      activeBuzzTeam = null;
+      clearActiveTurnGlow();
       _origNextQuestion();
     };
 
