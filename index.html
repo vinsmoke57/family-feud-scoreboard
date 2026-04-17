@@ -354,9 +354,10 @@
     }
 
     /* ===== MAIN LAYOUT ===== */
+    /* [UPGRADED] side columns 200px -> 150px to give the question board more room */
     #main {
       display: grid;
-      grid-template-columns: 200px 1fr 200px;
+      grid-template-columns: 150px 1fr 150px;
       gap: 10px;
       padding: 4px 14px 6px;
       height: calc(100vh - 88px);
@@ -366,12 +367,13 @@
     }
 
     /* ===== TEAM PANELS ===== */
+    /* [UPGRADED] tighter padding to compact the scoreboard */
     .team-panel {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 8px;
-      padding: 14px 10px;
+      gap: 6px;
+      padding: 10px 8px;
       border-radius: 16px;
       background: var(--bg2);
       border: 2px solid var(--border);
@@ -386,9 +388,10 @@
       border-top: 4px solid var(--secondary);
     }
 
+    /* [UPGRADED] smaller team name input */
     .team-name-input {
       font-family: 'Bebas Neue', sans-serif;
-      font-size: clamp(1.2rem, 2vw, 1.7rem);
+      font-size: clamp(1rem, 1.5vw, 1.3rem);
       letter-spacing: 0.1em;
       text-align: center;
       background: transparent;
@@ -414,9 +417,10 @@
       cursor: text;
     }
 
+    /* [UPGRADED] smaller score display */
     .score-display {
       font-family: 'Bebas Neue', sans-serif;
-      font-size: clamp(3rem, 6vw, 5.5rem);
+      font-size: clamp(2rem, 4vw, 3.5rem);
       line-height: 1;
       transition: transform 0.15s;
     }
@@ -555,10 +559,13 @@
       box-shadow: 0 4px 0 var(--secondary-dark);
     }
 
+    /* [UPGRADED] bigger question text + mixed-case font (Bebas Neue was forcing all-caps look).
+       Capitalization is handled by JS (see formatQuestionText) so acronyms like CSP, PV, DNI are preserved. */
     #question-text {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: clamp(2rem, 4vw, 3.5rem);
-      letter-spacing: 0.05em;
+      font-family: 'Outfit', 'Oswald', sans-serif;
+      font-weight: 600;
+      font-size: clamp(2.4rem, 4.8vw, 4.2rem);
+      letter-spacing: 0.01em;
       color: var(--text-dark);
       line-height: 1.2;
       padding: 0 24px;
@@ -580,22 +587,23 @@
       animation: slideDown 0.3s ease;
     }
 
+    /* [UPGRADED] bigger MC options (font + padding) */
     .option-btn {
       background: var(--bg);
       border: 2.5px solid var(--border);
       border-radius: 12px;
-      padding: 12px 16px;
+      padding: 16px 20px;
       font-family: 'Oswald', sans-serif;
-      font-size: clamp(0.85rem, 1.5vw, 1.15rem);
+      font-size: clamp(1.1rem, 1.9vw, 1.5rem);
       font-weight: 600;
-      letter-spacing: 0.04em;
+      letter-spacing: 0.03em;
       color: var(--text-dark);
       cursor: pointer;
       transition: all 0.2s;
       text-align: left;
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
       position: relative;
     }
 
@@ -605,17 +613,18 @@
       transform: translateY(-1px);
     }
 
+    /* [UPGRADED] bigger number badge to match bigger option text */
     .option-btn .opt-num {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 30px;
-      height: 30px;
+      width: 38px;
+      height: 38px;
       border-radius: 8px;
       background: var(--primary);
       color: white;
       font-family: 'Bebas Neue', sans-serif;
-      font-size: 1.2rem;
+      font-size: 1.5rem;
       flex-shrink: 0;
     }
 
@@ -1851,6 +1860,43 @@
     let activeBuzzTeam = null;  // 'a' or 'b' — who currently has the buzzer turn
 
     // ================================================================
+    //  [NEW] QUESTION TEXT FORMATTER
+    //  - Lowercases the question, then capitalizes only the first letter
+    //    of the first word.
+    //  - Preserves ALL-CAPS acronyms (2+ uppercase letters) like CSP, PV, DNI,
+    //    MPPT, HTF, LID, PID, SPD, DC, AC, MW, I–V, p–n, etc.
+    //  - Preserves hyphenated tokens (bypass words like "p–n" or "I–V" stay
+    //    whole and preserve their original casing).
+    // ================================================================
+    function formatQuestionText(str) {
+      if (!str) return '';
+      // Split into tokens keeping whitespace as separators so we can preserve spacing
+      const tokens = str.split(/(\s+)/);
+      let firstWordHandled = false;
+      const processed = tokens.map(tok => {
+        if (/^\s+$/.test(tok) || tok === '') return tok;
+        // Count consecutive A-Z letters (ignoring punctuation between)
+        const letters = tok.match(/[A-Za-z]/g) || [];
+        const upperLetters = tok.match(/[A-Z]/g) || [];
+        const isAcronym = letters.length >= 2 && upperLetters.length === letters.length;
+        // If it's ALL-CAPS letters only (acronym), keep as-is.
+        if (isAcronym) {
+          if (!firstWordHandled) firstWordHandled = true;
+          return tok;
+        }
+        // Otherwise lowercase it
+        let lower = tok.toLowerCase();
+        // First non-space word: uppercase its first letter (the first alphabetic char)
+        if (!firstWordHandled) {
+          firstWordHandled = true;
+          lower = lower.replace(/([a-z])/, (m) => m.toUpperCase());
+        }
+        return lower;
+      });
+      return processed.join('');
+    }
+
+    // ================================================================
     //  PERSISTENT QUESTION TRACKING (localStorage)
     // ================================================================
     const LS_KEY = 'askedQuestions';
@@ -2046,7 +2092,9 @@
       document.getElementById('answer-reveal').style.display = 'none';
       answerVisible = false;
       const qt = document.getElementById('question-text');
-      qt.textContent = currentQuestion.question;
+      // [UPGRADED] use smart formatter: first letter uppercase, rest lowercase,
+      // but acronyms (CSP, PV, DNI, MPPT, etc.) stay capitalized.
+      qt.textContent = formatQuestionText(currentQuestion.question);
       qt.style.display = 'block';
       qt.style.opacity = 0;
       requestAnimationFrame(() => { qt.style.opacity = 1; });
